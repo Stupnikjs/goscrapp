@@ -12,25 +12,30 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
+type Race struct {
+	Name  string
+	Day   string
+	Month string
+	Year  string
+}
+
 func main() {
 
 	// create context
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
-
+	var race Race
 	// run task list
 	var nodes []*cdp.Node
 	err := chromedp.Run(
 
 		ctx, chromedp.Tasks{
 			chromedp.Navigate("https://protiming.fr/Runnings/liste"),
-			// since the [chromedp.Populate] option has been added to opts, the
-			// [chromedp.Nodes] action will wait until after the [chromedp.PopulateWait]
-			// timeout has passed
 
 			chromedp.Nodes(`//div[@class="col-md-6 clickable visible-lg visible-md"]//*`, &nodes),
 			chromedp.ActionFunc(func(ctx context.Context) error {
-				printNodes(os.Stdout, nodes, "", "  ")
+
+				printNodes(os.Stdout, nodes, &race)
 				return nil
 			}),
 		})
@@ -43,24 +48,38 @@ func main() {
 	os.Exit(2)
 }
 
-func printNodes(w io.Writer, nodes []*cdp.Node, padding, indent string) {
+func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 	// This will block until the chromedp listener closes the channel
+
 	for _, node := range nodes {
-		switch {
-		case node.NodeName == "#text":
-			fmt.Fprintf(w, "%s#text: %q\n", padding, node.NodeValue)
-		default:
-			fmt.Fprintf(w, "%s%s:\n", padding, strings.ToLower(node.NodeName))
-			if n := len(node.Attributes); n > 0 {
-				fmt.Fprintf(w, "%sattributes:\n", padding+indent)
-				for i := 0; i < n; i += 2 {
-					fmt.Fprintf(w, "%s%s: %q\n", padding+indent+indent, node.Attributes[i], node.Attributes[i+1])
-				}
+
+		if node.NodeName == "#text" {
+
+			if node.Parent.AttributeValue("class") == "Cuprum" {
+				race.Name = node.NodeValue
+				print("name", race.Name)
 			}
+
+		}
+		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
+			if node.Parent.NodeName == "EM" {
+				race.Year = node.NodeValue
+			}
+			if node.Parent.NodeName == "SPAN" {
+				race.Day = node.NodeValue
+			}
+
+			if node.Parent.NodeName == "STRONG" {
+				race.Month = node.NodeValue
+			}
+
+			fmt.Println("here", node.NodeValue)
+
 		}
 		if node.ChildNodeCount > 0 {
-			fmt.Fprintf(w, "%schildren:\n", padding+indent)
-			printNodes(w, node.Children, padding+indent+indent, indent)
+			printNodes(w, node.Children, race)
 		}
+		fmt.Println(race)
 	}
+
 }
