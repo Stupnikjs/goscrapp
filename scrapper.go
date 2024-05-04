@@ -12,7 +12,7 @@ import (
 func getDateInfo(node *cdp.Node) (time.Time,error) {
    var day,mounth,year int 
    if node.Parent == nil {
- return "", error.New("no parent in this node")
+ return "", errors.New("no parent in this node")
 }
    if node.Parent.NodeName == "EM" {
     yearStr := node.NodeValue
