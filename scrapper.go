@@ -36,3 +36,41 @@ func getDateInfo(node *cdp.Node) (time.Time,error) {
 }
     return time.Date(year,time.Month(month),day,0,0,0,0,Time.UTC)
                         }
+
+
+func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
+	// This will block until the chromedp listener closes the channel
+
+	for _, node := range nodes {
+
+		if node.NodeName == "#text" {
+
+			if node.Parent.AttributeValue("class") == "Cuprum" {
+				race.Name = node.NodeValue
+				print("name", race.Name)
+			}
+
+		}
+		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
+			if node.Parent.NodeName == "EM" {
+				race.Year = node.NodeValue
+			}
+			if node.Parent.NodeName == "SPAN" {
+				race.Day = node.NodeValue
+			}
+
+			if node.Parent.NodeName == "STRONG" {
+				race.Month = node.NodeValue
+			}
+
+			fmt.Println("here", node.NodeValue)
+
+		}
+		if node.ChildNodeCount > 0 {
+			printNodes(w, node.Children, race)
+		}
+		fmt.Println(race)
+  
+	}
+
+}
