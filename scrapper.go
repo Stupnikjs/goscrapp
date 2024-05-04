@@ -9,7 +9,7 @@ import (
         "github.com/chromedp/chromedp"
 )
 
-func getDateInfo(node *cdp.Node) (time.Time,error) {
+func GetDateInfo(node *cdp.Node) (time.Time,error) {
    var day,mounth,year int 
    if node.Parent == nil {
  return "", errors.New("no parent in this node")
@@ -49,20 +49,12 @@ func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 
 		}
 		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
-			if node.Parent.NodeName == "EM" {
-				race.Year = node.NodeValue
+    d,err := GetDateInfo(node)
+    if err := nil {
+  fmt.Println(err)
+}
+    
 			}
-			if node.Parent.NodeName == "SPAN" {
-				race.Day = node.NodeValue
-			}
-
-			if node.Parent.NodeName == "STRONG" {
-				race.Month = node.NodeValue
-			}
-
-			fmt.Println("here", node.NodeValue)
-
-		}
 		if node.ChildNodeCount > 0 {
 			printNodes(w, node.Children, race)
 		}
