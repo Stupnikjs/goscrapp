@@ -14,9 +14,12 @@ import (
 
 type Race struct {
 	Name  string
-	Day   string
-	Month string
-	Year  string
+	Date time.Time
+ Link string
+ Lieu string 
+ Departement int 
+ 
+ 
 }
 
 func main() {
