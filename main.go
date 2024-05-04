@@ -84,3 +84,24 @@ func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 	}
 
 }
+
+
+func getDateInfo(node *cdp.Node) (string,error) {
+   if node.Parent == nil {
+ return "", error.New("no parent in this node")
+}
+   if node.Parent.NodeName == "EM" {
+				race.Year = node.NodeValue
+			}
+			if node.Parent.NodeName == "SPAN" {
+				race.Day = node.NodeValue
+			}
+
+			if node.Parent.NodeName == "STRONG" {
+				race.Month = node.NodeValue
+			}
+
+
+
+
+}
