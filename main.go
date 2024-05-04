@@ -80,6 +80,7 @@ func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 			printNodes(w, node.Children, race)
 		}
 		fmt.Println(race)
+  w.Write(race)
 	}
 
 }
