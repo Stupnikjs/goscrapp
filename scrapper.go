@@ -2,7 +2,8 @@ package main
 
 import (
         "strings"
-  "strconv"
+        "strconv"
+        "io"
         "github.com/chromedp/cdproto/cdp"
         "github.com/chromedp/chromedp"
 )
