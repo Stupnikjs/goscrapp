@@ -4,6 +4,7 @@ import (
         "strings"
         "strconv"
         "io"
+        "errors"
         "github.com/chromedp/cdproto/cdp"
         "github.com/chromedp/chromedp"
 )
