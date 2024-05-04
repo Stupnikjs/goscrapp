@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 	"strings"
-
+  "strconv"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
@@ -86,19 +86,28 @@ func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 }
 
 
-func getDateInfo(node *cdp.Node) (string,error) {
+func getDateInfo(node *cdp.Node) (time.Time,error) {
+   var day,mounth,year int 
    if node.Parent == nil {
  return "", error.New("no parent in this node")
 }
    if node.Parent.NodeName == "EM" {
-				race.Year = node.NodeValue
+    yearStr := node.NodeValue
+				year = strconv.Atoi(yearStr)
 			}
 			if node.Parent.NodeName == "SPAN" {
-				race.Day = node.NodeValue
+				dayStr := node.NodeValue
+    day = strconv.Atoi(dayStr)
 			}
 
 			if node.Parent.NodeName == "STRONG" {
-				race.Month = node.NodeValue
+				monthStr := node.NodeValue
+    // process 
+    mois := []string{"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"}
+    
+
+}
+    day = strconv.Atoi(dayStr)
 			}
 
 
