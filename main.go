@@ -113,7 +113,7 @@ func getDateInfo(node *cdp.Node) (time.Time,error) {
     mounth = monthIndexMap[monthStr]
     
 }
-    return time.Date(year,month,day,0,0,0,0)
+    return time.Date(year,time.Month(month),day,0,0,0,0,Time.UTC)
 			}
 
 
