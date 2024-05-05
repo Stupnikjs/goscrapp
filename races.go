@@ -29,7 +29,19 @@ func RacesToJson(dist *os.File, races []Race){
    
    
  JsonByte, err := json.Marshall(races)
- dist.WriteBytes(jsonByte)
+ 
+ if err != nil {
+
+fmt.Println(err)
+}
+ 
+ _, err = dist.WriteBytes(jsonByte)
+
+if err != nil {
+
+fmt.Println(err)
+}
+ 
  defer dist.Close()
 
 
