@@ -49,17 +49,22 @@ func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 
 		}
 		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
-    d,err := GetDateInfo(node)
+    
+    d,err := GetDateInfo(node)  
     if err := nil {
   fmt.Println(err)
 }
-    
+    race.Day = d
 			}
+
+  // pas de noeuds enfant 
 		if node.ChildNodeCount > 0 {
 			printNodes(w, node.Children, race)
 		}
-		fmt.Println(race)
+		
   
 	}
 
 }
+
+
