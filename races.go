@@ -1,48 +1,46 @@
-package main 
+package main
 
 import (
-"encoding/json"
+	"encoding/json"
+	"fmt"
+	"os"
+	"time"
 )
 
-
-type Race {
- Name string `json="name"`
- City string `json="city"`
- Link string `json="link"`
- Departement int `json="dep"`
- Site string `json="site"`
- 
+type Race struct {
+	Name        string    `json:"name"`
+	Date        time.Time `json:"date"`
+	City        string    `json:"city"`
+	Link        string    `json:"link"`
+	Departement int       `json:"dep"`
+	Site        string    `json:"site"`
 }
-
 
 func (r *Race) IsComplete() bool {
- if r.Name != "" && r.City != "" && r.Link != "" && r.Departement != 0 && r.Site != "" {
- return true
+	if r.Name != "" {
+		return true
 
-} 
- return false
+	}
+	return false
 
 }
 
+func RacesToJson(dist *os.File, races []Race) {
 
-func RacesToJson(dist *os.File, races []Race){
-   
-   
- JsonByte, err := json.Marshall(races)
- 
- if err != nil {
+	JsonByte, err := json.Marshal(races)
 
-fmt.Println(err)
-}
- 
- _, err = dist.WriteBytes(jsonByte)
+	if err != nil {
 
-if err != nil {
+		fmt.Println(err)
+	}
 
-fmt.Println(err)
-}
- 
- defer dist.Close()
+	_, err = dist.Write(JsonByte)
 
+	if err != nil {
+
+		fmt.Println(err)
+	}
+
+	defer dist.Close()
 
 }

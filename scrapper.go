@@ -1,39 +1,50 @@
 package main
 
 import (
-        "strings"
-        "strconv"
-        "io"
-        "errors"
-        "github.com/chromedp/cdproto/cdp"
-        "github.com/chromedp/chromedp"
+	"errors"
+	"fmt"
+	"io"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/chromedp/cdproto/cdp"
 )
 
-func GetDateInfo(node *cdp.Node) (time.Time,error) {
-   var day,mounth,year int 
-   if node.Parent == nil {
- return "", errors.New("no parent in this node")
+func GetDateInfo(node *cdp.Node) (map[string]int, error) {
+
+	dateMap := make(map[string]int)
+
+	if node.Parent == nil {
+		return nil, errors.New("no parent in this node")
+	}
+	if node.Parent.NodeName == "EM" {
+		yearStr := node.NodeValue
+		year, err := strconv.Atoi(yearStr)
+		dateMap["year"] = year
+		if err != nil {
+			return nil, err
+		}
+	}
+	if node.Parent.NodeName == "SPAN" {
+		dayStr := node.NodeValue
+		day, err := strconv.Atoi(dayStr)
+		dateMap["day"] = day
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if node.Parent.NodeName == "STRONG" {
+		monthStr := node.NodeValue
+
+		monthIndexMap := GetMonthMap()
+		month := monthIndexMap[monthStr]
+		dateMap["month"] = month
+
+	}
+	return dateMap, nil
 }
-   if node.Parent.NodeName == "EM" {
-    yearStr := node.NodeValue
-                                year = strconv.Atoi(yearStr)
-                        }
-                        if node.Parent.NodeName == "SPAN" {
-                                dayStr := node.NodeValue
-    day = strconv.Atoi(dayStr)
-                        }
-
-                        if node.Parent.NodeName == "STRONG" {
-                                monthStr := node.NodeValue
-   
-    
-    monthIndexMap := GetMonthMap()
-    mounth = monthIndexMap[monthStr]
-
-}
-    return time.Date(year,time.Month(month),day,0,0,0,0,Time.UTC)
-                        }
-
 
 func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 	// This will block until the chromedp listener closes the channel
@@ -44,27 +55,26 @@ func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 
 			if node.Parent.AttributeValue("class") == "Cuprum" {
 				race.Name = node.NodeValue
-				print("name", race.Name)
 			}
 
 		}
 		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
-    
-    d,err := GetDateInfo(node)  
-    if err := nil {
-  fmt.Println(err)
-}
-    race.Day = d
-			}
 
-  // pas de noeuds enfant 
+			d, err := GetDateInfo(node)
+			if err != nil {
+				fmt.Println(err)
+			}
+			race.Date = time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC)
+		}
+
+		// pas de noeuds enfant
 		if node.ChildNodeCount > 0 {
 			printNodes(w, node.Children, race)
 		}
-		
-  
+		if race.IsComplete() {
+			fmt.Println(race.Name, race.Date)
+		}
+
 	}
 
 }
-
-
