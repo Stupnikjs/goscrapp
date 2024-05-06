@@ -46,11 +46,11 @@ func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 	return dateMap, nil
 }
 
-func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
+func printNodes(w io.Writer, nodes []*cdp.Node, races *[]*Race) {
 	// This will block until the chromedp listener closes the channel
-
+	newRaces := *races
 	for _, node := range nodes {
-
+		race := Race{}
 		if node.NodeName == "#text" {
 
 			if node.Parent.AttributeValue("class") == "Cuprum" {
@@ -64,15 +64,28 @@ func printNodes(w io.Writer, nodes []*cdp.Node, race *Race) {
 			if err != nil {
 				fmt.Println(err)
 			}
-			race.Date = time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC)
+			race.Date = time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC).String()
 		}
 
 		// pas de noeuds enfant
 		if node.ChildNodeCount > 0 {
-			printNodes(w, node.Children, race)
-		}
-		if race.IsComplete() {
-			fmt.Println(race.Name, race.Date)
+			if race.IsComplete() {
+				isntinarr := false
+
+				for _, r := range newRaces {
+					if r.Name == race.Name && r.Date == race.Date {
+						isntinarr = true
+					}
+
+				}
+				if !isntinarr {
+					newRaces = append(newRaces, &race)
+					races = &newRaces
+				}
+
+			}
+			races = &newRaces
+			printNodes(w, node.Children, races)
 		}
 
 	}

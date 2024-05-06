@@ -10,17 +10,19 @@ import (
 )
 
 func main() {
-
+	var races *[]*Race
+	var nodes []*cdp.Node
 	// create context
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
+
 	url := "https://protiming.fr/Runnings/liste"
 	err := chromedp.Run(
 		ctx,
 		chromedp.Navigate(url),
-		getTasks(),
+		getTasks(nodes, races),
 		chromedp.Click(`(//ul[@class="paginator pagination pagination-sm pull-right"]/child::*)[2]`),
-		getTasks(),
+		getTasks(nodes, races),
 		chromedp.Click(`(//ul[@class="paginator pagination pagination-sm pull-right"]/child::*)[3]`),
 	)
 
@@ -28,19 +30,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	os.Exit(2)
 }
 
-func getTasks() *chromedp.Tasks {
-	var race Race
-	var nodes []*cdp.Node
+func getTasks(nodes []*cdp.Node, races *[]*Race) *chromedp.Tasks {
+
 	return &chromedp.Tasks{
 
 		chromedp.Nodes(`//div[@class="col-md-6 clickable visible-lg visible-md"]//*`, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 
-			printNodes(os.Stdout, nodes, &race)
+			printNodes(os.Stdout, nodes, races)
 			return nil
 		}),
 	}
+
 }

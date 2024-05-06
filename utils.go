@@ -13,3 +13,18 @@ func GetMonthMap() map[string]int {
 	return monthIndexMap
 
 }
+
+func RaceIsInArray(AllRaces *[]*Race, race Race) bool {
+	if AllRaces == nil {
+		return false
+	}
+
+	// Dereference the pointer to access the slice
+	races := *AllRaces
+	for _, r := range races {
+		if r.Date == race.Date && r.Name == race.Name {
+			return true
+		}
+	}
+	return false
+}

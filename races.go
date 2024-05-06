@@ -4,20 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"time"
 )
 
 type Race struct {
-	Name        string    `json:"name"`
-	Date        time.Time `json:"date"`
-	City        string    `json:"city"`
-	Link        string    `json:"link"`
-	Departement int       `json:"dep"`
-	Site        string    `json:"site"`
+	Name        string `json:"name"`
+	Date        string `json:"date"`
+	City        string `json:"city"`
+	Link        string `json:"link"`
+	Departement int    `json:"dep"`
+	Site        string `json:"site"`
 }
 
 func (r *Race) IsComplete() bool {
-	if r.Name != "" {
+	if r.Name != "" && r.Date != "" {
 		return true
 
 	}
