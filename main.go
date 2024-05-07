@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -10,7 +11,7 @@ import (
 )
 
 func main() {
-	var races *[]*Race
+	races := make([]*Race, 0)
 	var nodes []*cdp.Node
 	// create context
 	ctx, cancel := chromedp.NewContext(context.Background())
@@ -20,16 +21,16 @@ func main() {
 	err := chromedp.Run(
 		ctx,
 		chromedp.Navigate(url),
-		getTasks(nodes, races),
+		getTasks(nodes, &races),
 		chromedp.Click(`(//ul[@class="paginator pagination pagination-sm pull-right"]/child::*)[2]`),
-		getTasks(nodes, races),
+		getTasks(nodes, &races),
 		chromedp.Click(`(//ul[@class="paginator pagination pagination-sm pull-right"]/child::*)[3]`),
 	)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	fmt.Println(races)
 }
 
 func getTasks(nodes []*cdp.Node, races *[]*Race) *chromedp.Tasks {
