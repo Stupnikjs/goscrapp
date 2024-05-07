@@ -46,40 +46,32 @@ func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 	return dateMap, nil
 }
 
-func printNodes(w io.Writer, nodes []*cdp.Node, races *[]*Race) error {
+func printNodes(w io.Writer, nodes []*cdp.Node, races *[]Race, race *Race) {
 	// This will block until the chromedp listener closes the channel
 
-	newRaces := *races
 	for _, node := range nodes {
-		race := Race{}
-		if !race.IsComplete() {
-			if node.NodeName == "#text" {
-				if node.Parent.AttributeValue("class") == "Cuprum" {
-					race.Name = node.NodeValue
-					print(race.Name)
+		if node.NodeName == "#text" && node.Parent.AttributeValue("class") == "Cuprum" {
+			race.Name = node.NodeValue
+		}
 
-				}
+		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
+			d, err := GetDateInfo(node)
+			if err != nil {
+				fmt.Println(err)
 			}
+			race.Date = time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC).String()
+		}
 
-			if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
-				d, err := GetDateInfo(node)
-				if err != nil {
-					return fmt.Errorf("GetDateInfo: %w", err)
-				}
-				race.Date = time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC).String()
-			}
+		if race.isFull() &&  {
+			*races = append(*races, *race)
+			printNodes(w, node.Children, races, race)
+		}
 
-			// pas de noeuds enfant
-			if node.ChildNodeCount > 0 && race.IsComplete() {
-				err := printNodes(w, node.Children, races)
-				if err != nil {
-					return fmt.Errorf("recursive call to printNodes: %w", err)
-				}
-			}
-			races = &newRaces
+		if node.ChildNodeCount > 0 {
+			printNodes(w, node.Children, races, race)
 
 		}
-		newRaces = append(newRaces, &race)
+
 	}
-	return nil
+
 }
