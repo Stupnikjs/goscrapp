@@ -57,11 +57,17 @@ func printNodes(w io.Writer, nodes []*cdp.Node, races *[]Race, race *Race) {
 		if node.NodeName == "#text" && node.Parent.Parent.AttributeValue("class") == "col-md-12 textleft" && node.Parent.NodeName == "P" {
 			tosplit := strings.Split(node.NodeValue, ")")
 
-			trimed0 := strings.Split(tosplit[0], ")")
+			depsplit := strings.Split(tosplit[0], ")")
+			if len(strings.Split(depsplit[0], "(")) > 1 {
+				depint, err := strconv.Atoi(strings.Split(depsplit[0], "(")[1])
+				if err != nil {
+					fmt.Println(err)
+				}
+				race.Departement = depint
+			}
+			race.City = strings.TrimSpace(tosplit[1])
+			fmt.Println(tosplit)
 
-			trimed1 := strings.TrimSpace(tosplit[1])
-
-			fmt.Println(trimed1, trimed0)
 		}
 		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
 			d, err := GetDateInfo(node)
