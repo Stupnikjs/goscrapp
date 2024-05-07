@@ -1,5 +1,11 @@
 package main
 
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+)
+
 func GetMonthMap() map[string]int {
 
 	mois := []string{"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"}
@@ -14,17 +20,19 @@ func GetMonthMap() map[string]int {
 
 }
 
-func RaceIsInArray(AllRaces *[]*Race, race Race) bool {
-	if AllRaces == nil {
-		return false
-	}
+func RaceArrayJson(file *os.File, raceArr *[]Race) error {
 
-	// Dereference the pointer to access the slice
-	races := *AllRaces
-	for _, r := range races {
-		if r.Date == race.Date && r.Name == race.Name {
-			return true
-		}
+	jsonByte, err := json.Marshal(raceArr)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
 	}
-	return false
+	_, err = file.Write(jsonByte)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
+
 }

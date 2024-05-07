@@ -7,12 +7,13 @@ import (
 )
 
 type Race struct {
-	Name string `json:"name"`
-	Date string `json:"date"`
+	Name        string `json:"name"`
+	Date        string `json:"date"`
+	City        string `json:"city"`
+	Departement int    `json:"dep"`
 	/*
-		City        string `json:"city"`
 		Link        string `json:"link"`
-		Departement int    `json:"dep"`
+
 		Site        string `json:"site"`*
 	*/
 }
@@ -38,7 +39,7 @@ func RacesToJson(dist *os.File, races []Race) {
 }
 
 func (r *Race) isFull() bool {
-	if r.Name != "" && r.Date != "" {
+	if r.Name != "" && r.Date != "" && r.City != "" {
 		return true
 	}
 	return false
@@ -48,7 +49,7 @@ func (r *Race) isInRaces(arr *[]Race) bool {
 	r_val := *r
 	races := *arr
 	for _, race := range races {
-		if r_val.Name == race.Name && r_val.Date == race.Date {
+		if r_val.Name == race.Name && r_val.Date == race.Date && r_val.City == race.City && r_val.Departement == race.Departement {
 			return true
 		}
 	}
