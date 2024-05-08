@@ -63,6 +63,7 @@ func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 }
 
 func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data.Race) {
+start := Time.Time()
 	// This will block until the chromedp listener closes the channel
 
 	for _, node := range nodes {
@@ -107,5 +108,6 @@ func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data
 		}
 
 	}
+ fmt.Println(time.Since(start)
 
 }
