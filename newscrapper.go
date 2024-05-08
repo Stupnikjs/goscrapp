@@ -14,15 +14,16 @@ import (
 func GetCityInfo(node *cdp.Node) (map[string]string, error) {
 	cityMap := make(map[string]string)
 
-	tosplit := strings.Split(node.NodeValue, ")")
+	firstsplit := strings.Split(node.NodeValue, ")")
 
-	depsplit := strings.Split(tosplit[0], ")")
-	if len(strings.Split(depsplit[0], "(")) > 1 {
+	secsplit := strings.Split(firstsplit[0], ")")
+ thirdsplit := strings.Split(secsplit[0], "(")
+	if len(thirdsplit) > 1 {
 
-		cityMap["departement"] = strings.Split(depsplit[0], "(")[1]
+		cityMap["departement"] = strings.Split(secsplit[0], "(")[1]
 	}
-	cityMap["city"] = strings.TrimSpace(tosplit[0])
-	fmt.Println(tosplit)
+	cityMap["city"] = strings.TrimSpace(firstsplit[0])
+
 	return cityMap, nil
 }
 func GetDateInfo(node *cdp.Node) (map[string]int, error) {
