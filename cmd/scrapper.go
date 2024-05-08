@@ -16,11 +16,11 @@ import (
 func GetCityInfo(node *cdp.Node) (map[string]string, error) {
 	cityMap := make(map[string]string)
 
-	firstsplit := strings.Split(node.NodeValue, ")")
+	firstsplit := strings.Split(node.NodeValue, "(")
 
 	secsplit := strings.Split(firstsplit[0], ")")
-	thirdsplit := strings.Split(secsplit[0], "(")
-	if len(thirdsplit) > 1 {
+
+	if len(secsplit) > 1 {
 
 		cityMap["departement"] = strings.Split(secsplit[0], "(")[1]
 	}
