@@ -11,11 +11,8 @@ type Race struct {
 	Date        string `json:"date"`
 	City        string `json:"city"`
 	Departement int    `json:"dep"`
-	/*
-		Link        string `json:"link"`
-
-		Site        string `json:"site"`*
-	*/
+	Link        string `json:"link"`
+	Site        string `json:"site"`
 }
 
 func RacesToJson(dist *os.File, races []Race) {
