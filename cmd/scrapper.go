@@ -94,7 +94,8 @@ start := Time.Time()
 			if err != nil {
 				fmt.Println(err)
 			}
-			race.Date = time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC).String()
+			timeDate := time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC)
+   race.Date = FormatDate(timeDate)
 		}
 
 		if race.IsFull() && !race.IsInRaces(races) {
