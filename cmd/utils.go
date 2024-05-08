@@ -13,3 +13,9 @@ func GetMonthMap() map[string]int {
 	return monthIndexMap
 
 }
+
+
+func FormatDate(t time.Time) string {
+
+// implement this func
+}
