@@ -71,7 +71,22 @@ func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data
 		}
 
 		if node.NodeName == "#text" && node.Parent.Parent.AttributeValue("class") == "col-md-12 textleft" && node.Parent.NodeName == "P" {
+			mapCity, err := GetCityInfo(node)
+			if err != nil {
+				fmt.Println(err)
+			}
+			race.City = mapCity["city"]
+			depStr := mapCity["departement"]
 
+			dep, err := strconv.Atoi(depStr)
+			if err != nil {
+				fmt.Println(err)
+			}
+			race.Departement = dep
+
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
 			d, err := GetDateInfo(node)
