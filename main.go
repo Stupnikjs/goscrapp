@@ -24,14 +24,7 @@ func main() {
 
 	url := "https://protiming.fr/Runnings/liste"
 
-	actions := []chromedp.Action{
-		chromedp.Navigate(url),
-	}
-
-	for i := 2; i <= 5; i++ {
-		xpath := fmt.Sprintf(`(//ul[@class="paginator pagination pagination-sm pull-right"]/child::*)[%d]`, i)
-		actions = append(actions, chromedp.Click(xpath), oldGetTasks(nodes, &races, race))
-	}
+	actions := GetActions()
 
 	err := chromedp.Run(
 		ctx,
@@ -69,9 +62,17 @@ func oldGetTasks(nodes []*cdp.Node, races *[]Race, race *Race) *chromedp.Tasks {
 
 
 
-func getActions() []chromedp.Action {
+func GetActions() []chromedp.Action {
 
+        actions := []chromedp.Action{
+                chromedp.Navigate(url),
+        }
 
+        for i := 2; i <= 5; i++ {
+                xpath := fmt.Sprintf(`(//ul[@class="paginator pagination pagination-sm pull-right"]/child::*)[%d]`, i)
+                actions = append(actions, chromedp.Click(xpath), oldGetTasks(nodes, &races, race))
+        }
+     return actions
 
 }
 /*
