@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Stupnikjs/goscrapper/pkg/data"
-	"github.com/Stupnikjs/goscrapper/pkg/scrapper"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
@@ -54,7 +53,7 @@ func oldGetTasks(nodes []*cdp.Node, races *[]data.Race, race *data.Race) *chrome
 		chromedp.Nodes(`//div[@class="col-md-6 clickable visible-lg visible-md"]//*`, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 
-			scrapper.RecurseNodes(os.Stdout, nodes, races, race)
+			RecurseNodes(os.Stdout, nodes, races, race)
 			return nil
 		}),
 	}
