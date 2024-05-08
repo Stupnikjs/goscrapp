@@ -21,6 +21,6 @@ var day,month,year string
 day = t.Format("2")   
 month = t.Format("01")
 year = t.Format("2006")
-return fmt.SPrintf("%s%s%s", day,month,year)
+return fmt.Sprintf("%s-%s-%s", day,month,year)
 
 }
