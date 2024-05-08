@@ -16,6 +16,6 @@ func GetMonthMap() map[string]int {
 
 
 func FormatDate(t time.Time) string {
-
+var day,month,year string
 // implement this func
 }
