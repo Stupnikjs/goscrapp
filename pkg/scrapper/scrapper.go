@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Stupnikjs/goscrapper/pkg/data"
 	"github.com/chromedp/cdproto/cdp"
 )
 
@@ -17,7 +18,7 @@ func GetCityInfo(node *cdp.Node) (map[string]string, error) {
 	firstsplit := strings.Split(node.NodeValue, ")")
 
 	secsplit := strings.Split(firstsplit[0], ")")
- thirdsplit := strings.Split(secsplit[0], "(")
+	thirdsplit := strings.Split(secsplit[0], "(")
 	if len(thirdsplit) > 1 {
 
 		cityMap["departement"] = strings.Split(secsplit[0], "(")[1]
@@ -61,7 +62,7 @@ func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 	return dateMap, nil
 }
 
-func printNodes(w io.Writer, nodes []*cdp.Node, races *[]Race, race *Race) {
+func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data.Race) {
 	// This will block until the chromedp listener closes the channel
 
 	for _, node := range nodes {
