@@ -7,13 +7,15 @@ import (
 	"os"
 	"time"
 
+	"github.com/Stupnikjs/goscrapper/pkg/data"
+	"github.com/Stupnikjs/goscrapper/pkg/scrapper"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
 
 func main() {
-	races := make([]Race, 0)
-	race := &Race{}
+	races := make([]data.Race, 0)
+	race := &data.Race{}
 	var nodes []*cdp.Node
 
 	ctx, _ := chromedp.NewContext(context.Background())
@@ -39,26 +41,26 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = RaceArrayJson(file, &races)
+	err = data.RaceArrayJson(file, &races)
 
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func oldGetTasks(nodes []*cdp.Node, races *[]Race, race *Race) *chromedp.Tasks {
+func oldGetTasks(nodes []*cdp.Node, races *[]data.Race, race *data.Race) *chromedp.Tasks {
 
 	return &chromedp.Tasks{
 		chromedp.Nodes(`//div[@class="col-md-6 clickable visible-lg visible-md"]//*`, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 
-			RecurseNodes(os.Stdout, nodes, races, race)
+			scrapper.RecurseNodes(os.Stdout, nodes, races, race)
 			return nil
 		}),
 	}
 }
 
-func GetActions(url string, nodes []*cdp.Node, races *[]Race, race *Race) []chromedp.Action {
+func GetActions(url string, nodes []*cdp.Node, races *[]data.Race, race *data.Race) []chromedp.Action {
 
 	actions := []chromedp.Action{
 		chromedp.Navigate(url),

@@ -1,10 +1,4 @@
-package main
-
-import (
-	"encoding/json"
-	"fmt"
-	"os"
-)
+package scrapper
 
 func GetMonthMap() map[string]int {
 
@@ -17,22 +11,5 @@ func GetMonthMap() map[string]int {
 	}
 
 	return monthIndexMap
-
-}
-
-func RaceArrayJson(file *os.File, raceArr *[]Race) error {
-
-	jsonByte, err := json.Marshal(raceArr)
-
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	_, err = file.Write(jsonByte)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-	return nil
 
 }

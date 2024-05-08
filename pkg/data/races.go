@@ -1,4 +1,4 @@
-package main
+package data
 
 import (
 	"encoding/json"
@@ -38,14 +38,14 @@ func RacesToJson(dist *os.File, races []Race) {
 
 }
 
-func (r *Race) isFull() bool {
+func (r *Race) IsFull() bool {
 	if r.Name != "" && r.Date != "" && r.City != "" {
 		return true
 	}
 	return false
 }
 
-func (r *Race) isInRaces(arr *[]Race) bool {
+func (r *Race) IsInRaces(arr *[]Race) bool {
 	r_val := *r
 	races := *arr
 	for _, race := range races {

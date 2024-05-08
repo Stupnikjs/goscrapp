@@ -1,4 +1,4 @@
-package main
+package scrapper
 
 import (
 	"errors"
@@ -81,13 +81,13 @@ func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data
 			race.Date = time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC).String()
 		}
 
-		if race.isFull() && !race.isInRaces(races) {
+		if race.IsFull() && !race.IsInRaces(races) {
 			*races = append(*races, *race)
-			printNodes(w, node.Children, races, race)
+			RecurseNodes(w, node.Children, races, race)
 		}
 
 		if node.ChildNodeCount > 0 {
-			printNodes(w, node.Children, races, race)
+			RecurseNodes(w, node.Children, races, race)
 
 		}
 
