@@ -11,6 +11,20 @@ import (
 	"github.com/chromedp/cdproto/cdp"
 )
 
+func GetCityInfo(node *cdp.Node) (map[string]string, error) {
+	cityMap := make(map[string]string)
+
+	tosplit := strings.Split(node.NodeValue, ")")
+
+	depsplit := strings.Split(tosplit[0], ")")
+	if len(strings.Split(depsplit[0], "(")) > 1 {
+
+		cityMap["departement"] = strings.Split(depsplit[0], "(")[1]
+	}
+	cityMap["city"] = strings.TrimSpace(tosplit[0])
+	fmt.Println(tosplit)
+	return cityMap, nil
+}
 func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 
 	dateMap := make(map[string]int)
@@ -55,18 +69,6 @@ func printNodes(w io.Writer, nodes []*cdp.Node, races *[]Race, race *Race) {
 		}
 
 		if node.NodeName == "#text" && node.Parent.Parent.AttributeValue("class") == "col-md-12 textleft" && node.Parent.NodeName == "P" {
-			tosplit := strings.Split(node.NodeValue, ")")
-
-			depsplit := strings.Split(tosplit[0], ")")
-			if len(strings.Split(depsplit[0], "(")) > 1 {
-				depint, err := strconv.Atoi(strings.Split(depsplit[0], "(")[1])
-				if err != nil {
-					fmt.Println(err)
-				}
-				race.Departement = depint
-			}
-			race.City = strings.TrimSpace(tosplit[1])
-			fmt.Println(tosplit)
 
 		}
 		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
