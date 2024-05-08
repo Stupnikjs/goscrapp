@@ -63,7 +63,7 @@ func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 }
 
 func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data.Race) {
-start := Time.Time()
+	start := time.Now()
 	// This will block until the chromedp listener closes the channel
 
 	for _, node := range nodes {
@@ -95,7 +95,7 @@ start := Time.Time()
 				fmt.Println(err)
 			}
 			timeDate := time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC)
-   race.Date = FormatDate(timeDate)
+			race.Date = FormatDate(timeDate)
 		}
 
 		if race.IsFull() && !race.IsInRaces(races) {
@@ -109,6 +109,6 @@ start := Time.Time()
 		}
 
 	}
- fmt.Println(time.Since(start)
+	fmt.Println(time.Since(start))
 
 }
