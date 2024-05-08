@@ -7,12 +7,12 @@ import (
 
 func GetMonthMap() map[string]int {
 
-	mois := []string{"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"}
+	mois := []string{"Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."}
 	monthIndexMap := make(map[string]int)
 
 	// Populate the map with French month names and their respective index values
 	for i, moisItem := range mois {
-		monthIndexMap[moisItem] = i
+		monthIndexMap[moisItem] = i + 1
 	}
 
 	return monthIndexMap
@@ -20,11 +20,11 @@ func GetMonthMap() map[string]int {
 }
 
 func FormatDate(t time.Time) string {
-	var day, month, year string
+	var day, month, year int
 
-	day = t.Format("2")
-	month = t.Format("01")
-	year = t.Format("2006")
-	return fmt.Sprintf("%s-%s-%s", day, month, year)
+	day = t.Day()
+	month = int(t.Month())
+	year = t.Year()
+	return fmt.Sprintf("%d-%d-%d", day, month, year)
 
 }

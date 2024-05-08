@@ -31,39 +31,47 @@ func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 
 	dateMap := make(map[string]int)
 
-	if node.Parent == nil {
-		return nil, errors.New("no parent in this node")
-	}
-	if node.Parent.NodeName == "EM" {
-		yearStr := node.NodeValue
-		year, err := strconv.Atoi(yearStr)
-		dateMap["year"] = year
-		if err != nil {
-			return nil, err
+	for _, n := range node.Children {
+		if n.Parent == nil {
+			return nil, errors.New("no parent in this node")
+		}
+		if n.NodeName == "EM" {
+			yearStr := n.Children[0].NodeValue
+			year, err := strconv.Atoi(yearStr)
+			if year == -1 || year == 2023 {
+				fmt.Println(node.Parent.NodeValue)
+				fmt.Println(node.Parent.Attributes)
+			}
+			dateMap["year"] = year
+			if err != nil {
+				return nil, err
+			}
+		}
+		if n.NodeName == "SPAN" {
+			dayStr := n.Children[0].NodeValue
+			day, err := strconv.Atoi(dayStr)
+			dateMap["day"] = day
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if n.NodeName == "STRONG" {
+			monthStr := n.Children[0].NodeValue
+
+			monthIndexMap := GetMonthMap()
+			month := monthIndexMap[strings.TrimSpace(monthStr)]
+			print(monthStr)
+			dateMap["month"] = month
+
 		}
 	}
-	if node.Parent.NodeName == "SPAN" {
-		dayStr := node.NodeValue
-		day, err := strconv.Atoi(dayStr)
-		dateMap["day"] = day
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if node.Parent.NodeName == "STRONG" {
-		monthStr := node.NodeValue
-
-		monthIndexMap := GetMonthMap()
-		month := monthIndexMap[monthStr]
-		dateMap["month"] = month
-
-	}
+	fmt.Println(dateMap)
 	return dateMap, nil
 }
 
 func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data.Race) {
-	start := time.Now()
+
 	// This will block until the chromedp listener closes the channel
 
 	for _, node := range nodes {
@@ -89,7 +97,7 @@ func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data
 				fmt.Println(err)
 			}
 		}
-		if strings.Contains(node.Parent.Parent.AttributeValue("id"), "calendar") {
+		if node.NodeName == "TIME" {
 			d, err := GetDateInfo(node)
 			if err != nil {
 				fmt.Println(err)
@@ -99,6 +107,7 @@ func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data
 		}
 
 		if race.IsFull() && !race.IsInRaces(races) {
+			race.Site = "protiming"
 			*races = append(*races, *race)
 			RecurseNodes(w, node.Children, races, race)
 		}
@@ -109,6 +118,5 @@ func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data
 		}
 
 	}
-	fmt.Println(time.Since(start))
 
 }

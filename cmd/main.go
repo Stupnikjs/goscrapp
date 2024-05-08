@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	start := time.Now()
 	races := make([]data.Race, 0)
 	race := &data.Race{}
 	var nodes []*cdp.Node
@@ -45,6 +46,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(time.Since(start))
 }
 
 func oldGetTasks(nodes []*cdp.Node, races *[]data.Race, race *data.Race) *chromedp.Tasks {
