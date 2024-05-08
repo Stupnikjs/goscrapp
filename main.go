@@ -67,6 +67,13 @@ func oldGetTasks(nodes []*cdp.Node, races *[]Race, race *Race) *chromedp.Tasks {
 	}
 }
 
+
+
+func getActions() []chromedp.Action {
+
+
+
+}
 /*
 func getTasks(nodes []*cdp.Node, races *[]Race, race *Race, links []*cdp.Node) []*chromedp.Tasks {
 	tasks := []*chromedp.Tasks{}
