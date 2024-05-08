@@ -16,8 +16,6 @@ func main() {
 	race := &Race{}
 	var nodes []*cdp.Node
 
-	// create context
-
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
 	defer cancel()
