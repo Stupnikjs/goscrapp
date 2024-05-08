@@ -12,6 +12,7 @@ import (
 	"github.com/chromedp/cdproto/cdp"
 )
 
+// NOT WORKING
 func GetCityInfo(node *cdp.Node) (map[string]string, error) {
 	cityMap := make(map[string]string)
 
@@ -38,10 +39,7 @@ func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 		if n.NodeName == "EM" {
 			yearStr := n.Children[0].NodeValue
 			year, err := strconv.Atoi(yearStr)
-			if year == -1 || year == 2023 {
-				fmt.Println(node.Parent.NodeValue)
-				fmt.Println(node.Parent.Attributes)
-			}
+
 			dateMap["year"] = year
 			if err != nil {
 				return nil, err
@@ -75,41 +73,17 @@ func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data
 	// This will block until the chromedp listener closes the channel
 
 	for _, node := range nodes {
-		if node.NodeName == "#text" && node.Parent.AttributeValue("class") == "Cuprum" {
-			race.Name = node.NodeValue
+		race, err := ProcessNode(node, race)
+
+		if err != nil {
+			fmt.Println(err)
 		}
-
-		if node.NodeName == "#text" && node.Parent.Parent.AttributeValue("class") == "col-md-12 textleft" && node.Parent.NodeName == "P" {
-			mapCity, err := GetCityInfo(node)
-			if err != nil {
-				fmt.Println(err)
-			}
-			race.City = mapCity["city"]
-			depStr := mapCity["departement"]
-
-			dep, err := strconv.Atoi(depStr)
-			if err != nil {
-				fmt.Println(err)
-			}
-			race.Departement = dep
-
-			if err != nil {
-				fmt.Println(err)
-			}
-		}
-		if node.NodeName == "TIME" {
-			d, err := GetDateInfo(node)
-			if err != nil {
-				fmt.Println(err)
-			}
-			timeDate := time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC)
-			race.Date = FormatDate(timeDate)
-		}
-
 		if race.IsFull() && !race.IsInRaces(races) {
 			race.Site = "protiming"
 			*races = append(*races, *race)
-			RecurseNodes(w, node.Children, races, race)
+			race = &data.Race{}
+
+			// RecurseNodes(w, node.Children, races, race)
 		}
 
 		if node.ChildNodeCount > 0 {
@@ -119,4 +93,40 @@ func RecurseNodes(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data
 
 	}
 
+}
+
+func ProcessNode(node *cdp.Node, race *data.Race) (*data.Race, error) {
+	if node.NodeName == "#text" && node.Parent.AttributeValue("class") == "Cuprum" {
+		race.Name = node.NodeValue
+	}
+
+	if node.NodeName == "#text" && node.Parent.Parent.AttributeValue("class") == "col-md-12 textleft" && node.Parent.NodeName == "P" {
+		mapCity, err := GetCityInfo(node)
+		if err != nil {
+			return nil, err
+		}
+		race.City = mapCity["city"]
+		depStr := mapCity["departement"]
+
+		dep, err := strconv.Atoi(depStr)
+		if err != nil {
+			return nil, err
+		}
+		race.Departement = dep
+
+	}
+	if node.NodeName == "TIME" {
+		d, err := GetDateInfo(node)
+		if err != nil {
+			return nil, err
+		}
+		timeDate := time.Date(d["year"], time.Month(d["month"]), d["day"], 0, 0, 0, 0, time.UTC)
+		race.Date = FormatDate(timeDate)
+	}
+
+	if node.AttributeValue("class") == "panel-container event-mosaic-bg" {
+		runid := node.AttributeValue("id")[3:]
+		race.Link = fmt.Sprintf("https://www.protiming.fr/Runnings/detail/%s", runid)
+	}
+	return race, nil
 }

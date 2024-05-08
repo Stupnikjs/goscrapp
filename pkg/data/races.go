@@ -36,7 +36,8 @@ func RacesToJson(dist *os.File, races []Race) {
 }
 
 func (r *Race) IsFull() bool {
-	if r.Name != "" && r.Date != "" && r.City != "" {
+	if r.Name != "" && r.Date != "" && r.City != "" && r.Link != "" && r.Site == "" &&
+		r.Departement != 0 {
 		return true
 	}
 	return false
@@ -46,9 +47,17 @@ func (r *Race) IsInRaces(arr *[]Race) bool {
 	r_val := *r
 	races := *arr
 	for _, race := range races {
-		if r_val.Name == race.Name && r_val.Date == race.Date && r_val.City == race.City && r_val.Departement == race.Departement {
+		if race.Equals(r_val) {
 			return true
 		}
+	}
+	return false
+}
+
+func (r Race) Equals(race Race) bool {
+	if r.Name == race.Name && r.Date == race.Date && r.City == race.City &&
+		r.Departement == race.Departement && r.Link == race.Link && r.Site == race.Site {
+		return true
 	}
 	return false
 }

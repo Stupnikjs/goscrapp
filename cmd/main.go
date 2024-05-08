@@ -41,7 +41,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = data.RaceArrayJson(file, &races)
+	wuDuplicates := data.RemoveDuplicates(&races)
+	err = data.RaceArrayJson(file, &wuDuplicates)
 
 	if err != nil {
 		log.Fatal(err)
