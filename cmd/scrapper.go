@@ -31,11 +31,12 @@ func GetCityInfo(node *cdp.Node) (map[string]string, error) {
 func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 
 	dateMap := make(map[string]int)
+ if node.NodeName != "expected" {
+ fmt.Println(node.NodeName)
+ return nil, errors.New("wrong node processed by getDateInfo") }
 
 	for _, n := range node.Children {
-		if n.Parent == nil {
-			return nil, errors.New("no parent in this node")
-		}
+		
 		if n.NodeName == "EM" {
 			yearStr := n.Children[0].NodeValue
 			year, err := strconv.Atoi(yearStr)
@@ -64,7 +65,6 @@ func GetDateInfo(node *cdp.Node) (map[string]int, error) {
 
 		}
 	}
-	fmt.Println(dateMap)
 	return dateMap, nil
 }
 
