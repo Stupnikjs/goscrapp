@@ -41,8 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	wuDuplicates := data.RemoveDuplicates(&races)
-	err = data.RaceArrayJson(file, &wuDuplicates)
+	err = data.RaceArrayJson(file, &races)
 
 	if err != nil {
 		log.Fatal(err)
@@ -56,7 +55,7 @@ func oldGetTasks(nodes []*cdp.Node, races *[]data.Race, race *data.Race) *chrome
 		chromedp.Nodes(`//div[@class="col-md-6 clickable visible-lg visible-md"]//*`, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 
-			RecurseNodes(os.Stdout, nodes, races, race)
+			ProcessNode(os.Stdout, nodes, races, race)
 			return nil
 		}),
 	}

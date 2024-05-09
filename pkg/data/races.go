@@ -36,8 +36,8 @@ func RacesToJson(dist *os.File, races []Race) {
 }
 
 func (r *Race) IsFull() bool {
-	if r.Name != "" && r.Date != "" && r.City != "" && r.Link != "" && r.Site == "" &&
-		r.Departement != 0 {
+
+	if r.Name != "" && r.Date != "" && r.City != "" && r.Link != "" {
 		return true
 	}
 	return false
