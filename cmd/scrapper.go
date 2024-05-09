@@ -22,7 +22,7 @@ func GetCityInfo(node *cdp.Node) (map[string]string, error) {
 
 	if len(secsplit) > 1 {
 
-		cityMap["departement"] = strings.Split(secsplit[0], "(")[1]
+		cityMap["departement"] = strings.TrimSpace(secsplit[0])
 	}
 	cityMap["city"] = strings.TrimSpace(firstsplit[0])
 
