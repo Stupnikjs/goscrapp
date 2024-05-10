@@ -20,7 +20,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
 	defer cancel()
 
-	
+	races := Scrap(ctx, url, nodes, races)
 
 
 	if err != nil {
