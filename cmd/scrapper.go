@@ -13,7 +13,7 @@ import (
 func ProcessNode(w io.Writer, nodes []*cdp.Node) {
 
 	for i, node := range nodes {
-		fmt.Println("node number :", i)	
+		fmt.Printf("node number :%d , node children count %d", i, node.ChildrenCount)	
 
  }
 }
