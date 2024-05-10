@@ -7,7 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/Stupnikjs/goscrapper/pkg/data"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
@@ -15,69 +14,35 @@ import (
 func main() {
 	start := time.Now()
 	var nodes []*cdp.Node
+	var selector string = `//div[@class="col-md-6 clickable visible-lg visible-md"]//*`
+	var url string = "https://protiming.fr/Runnings/liste"
 
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
 	defer cancel()
 
-	races := Scrap(ctx, url, nodes, races)
+	Scrap(ctx, selector, url, nodes)
 
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err != nil {
-		log.Fatal(err)
-	}
 	fmt.Println(time.Since(start))
 }
 
-var selector string = `//div[@class="col-md-6 clickable visible-lg visible-md"]//*`
+func Scrap(ctx context.Context, selector string, URL string, nodes []*cdp.Node) {
+	obj := map[string]string{}
+	err := chromedp.Run(
+		ctx,
+		chromedp.Navigate(URL),
+		&chromedp.Tasks{
+			chromedp.Nodes(selector, &nodes),
+			chromedp.ActionFunc(func(ctx context.Context) error {
 
-func oldGetTasks(nodes []*cdp.Node, races *[]data.Race, race *data.Race) *chromedp.Tasks {
-
-	return &chromedp.Tasks{
-		chromedp.Nodes(selector, &nodes),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-
-			ProcessNode(os.Stdout, nodes)
-			return nil
-		}),
-	}
-}
-
-func GetActions(url string, nodes []*cdp.Node, races *[]data.Race, race *data.Race) []chromedp.Action {
-
-	actions := []chromedp.Action{
-		chromedp.Navigate(url),
-	}
-
-	for i := 2; i <= 5; i++ {
-		xpath := fmt.Sprintf(`(//ul[@class="paginator pagination pagination-sm pull-right"]/child::*)[%d]`, i)
-		actions = append(actions, chromedp.Click(xpath), oldGetTasks(nodes, races, race))
-	}
-	return actions
-
-}
-
-func Scrap(ctx context, URL string, nodes, entity interface{}) interface{} {
-
-   
-   
-   url := "https://protiming.fr/Runnings/liste"
-
-  	actions := GetActions(url, nodes, &races,     entity)
-
-	  err := chromedp.Run(
-		 ctx,
-		 actions...,
+				ProcessNode(os.Stdout, nodes, &obj)
+				return nil
+			}),
+		},
 	)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-  return races 
 
 }
