@@ -20,19 +20,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
 	defer cancel()
 
-	url := "https://protiming.fr/Runnings/liste"
-
-	actions := GetActions(url, nodes, &races, race)
-
-	err := chromedp.Run(
-		ctx,
-		actions...,
-	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	
 
 
 	if err != nil {
@@ -70,5 +58,26 @@ func GetActions(url string, nodes []*cdp.Node, races *[]data.Race, race *data.Ra
 		actions = append(actions, chromedp.Click(xpath), oldGetTasks(nodes, races, race))
 	}
 	return actions
+
+}
+
+func Scrap(ctx context, URL string, nodes, interface{}) interface{} {
+
+
+   
+   url := "https://protiming.fr/Runnings/liste"
+
+  	actions := GetActions(url, nodes, &races,     race)
+
+	  err := chromedp.Run(
+		 ctx,
+		 actions...,
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+  return races 
 
 }
