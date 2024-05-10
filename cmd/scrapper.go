@@ -10,22 +10,11 @@ import (
 
 // NOT WORKING
 
-func ProcessNode(w io.Writer, nodes []*cdp.Node, races *[]data.Race, race *data.Race) {
+func ProcessNode(w io.Writer, nodes []*cdp.Node) {
 
 	for i, node := range nodes {
-		fmt.Println("node number :", i)
-		race, err := NodeQuery(node, race)
-		if err != nil {
-			fmt.Println(err)
-		}
+		fmt.Println("node number :", i)	
 
-		if race.IsFull() && !race.IsInRaces(races) {
-			race.Site = "protiming"
-			*races = append(*races, *race)
-			race = &data.Race{}
-
-		}
-
-	}
-
+ }
 }
+
