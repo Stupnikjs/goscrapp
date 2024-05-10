@@ -35,13 +35,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	file, err := os.OpenFile("new.json", os.O_CREATE, 0664)
+
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	err = data.RaceArrayJson(file, &races)
 
 	if err != nil {
 		log.Fatal(err)
@@ -49,10 +47,12 @@ func main() {
 	fmt.Println(time.Since(start))
 }
 
+var selector string = `//div[@class="col-md-6 clickable visible-lg visible-md"]//*`
+
 func oldGetTasks(nodes []*cdp.Node, races *[]data.Race, race *data.Race) *chromedp.Tasks {
 
 	return &chromedp.Tasks{
-		chromedp.Nodes(`//div[@class="col-md-6 clickable visible-lg visible-md"]//*`, &nodes),
+		chromedp.Nodes(selector, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 
 			ProcessNode(os.Stdout, nodes)
