@@ -61,13 +61,13 @@ func GetActions(url string, nodes []*cdp.Node, races *[]data.Race, race *data.Ra
 
 }
 
-func Scrap(ctx context, URL string, nodes, interface{}) interface{} {
+func Scrap(ctx context, URL string, nodes, entity interface{}) interface{} {
 
-
+   
    
    url := "https://protiming.fr/Runnings/liste"
 
-  	actions := GetActions(url, nodes, &races,     race)
+  	actions := GetActions(url, nodes, &races,     entity)
 
 	  err := chromedp.Run(
 		 ctx,
