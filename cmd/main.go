@@ -55,7 +55,7 @@ func oldGetTasks(nodes []*cdp.Node, races *[]data.Race, race *data.Race) *chrome
 		chromedp.Nodes(`//div[@class="col-md-6 clickable visible-lg visible-md"]//*`, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 
-			ProcessNode(os.Stdout, nodes, races, race)
+			ProcessNode(os.Stdout, nodes)
 			return nil
 		}),
 	}
