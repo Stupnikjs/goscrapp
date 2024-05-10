@@ -14,8 +14,6 @@ import (
 
 func main() {
 	start := time.Now()
-	races := make([]data.Race, 0)
-	race := &data.Race{}
 	var nodes []*cdp.Node
 
 	ctx, _ := chromedp.NewContext(context.Background())
