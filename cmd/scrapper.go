@@ -7,8 +7,6 @@ import (
 	"github.com/chromedp/cdproto/cdp"
 )
 
-// NOT WORKING
-
 func ProcessNode(w io.Writer, nodes []*cdp.Node, obj *map[string]string) {
 
 	for _, node := range nodes {
@@ -23,8 +21,17 @@ func ProcessNode(w io.Writer, nodes []*cdp.Node, obj *map[string]string) {
 			obj["city"] = node.NodeValue
 
 		}
-		if node.NodeName == "TIME" {
-			obj["date"] = node.NodeValue
+		if node.Parent.NodeName == "TIME" {
+			if node.NodeName == "SPAN" {
+				obj["day"] = node.NodeValue
+			}
+			if node.NodeName == "SPAN" {
+				obj["day"] = node.NodeValue
+			}
+			if node.NodeName == "SPAN" {
+				obj["day"] = node.NodeValue
+			}
+
 		}
 
 		if node.AttributeValue("class") == "panel-container event-mosaic-bg" {
@@ -37,8 +44,9 @@ func ProcessNode(w io.Writer, nodes []*cdp.Node, obj *map[string]string) {
 			ProcessNode(w, node.Children, &obj)
 		}
 		if len(obj) > 4 {
-			fmt.Println(obj)
+			fmt.Print("/n", obj)
 		}
+
 		obj = map[string]string{}
 
 	}

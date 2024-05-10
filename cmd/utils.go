@@ -1,10 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
-
 func GetMonthMap() map[string]int {
 
 	mois := []string{"Janv.", "Févr.", "Mars", "Avril", "Mai", "Juin", "Juil.", "Août", "Sept.", "Oct.", "Nov.", "Déc."}
@@ -16,15 +11,5 @@ func GetMonthMap() map[string]int {
 	}
 
 	return monthIndexMap
-
-}
-
-func FormatDate(t time.Time) string {
-	var day, month, year int
-
-	day = t.Day()
-	month = int(t.Month())
-	year = t.Year()
-	return fmt.Sprintf("%d-%d-%d", day, month, year)
 
 }
