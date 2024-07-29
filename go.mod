@@ -3,7 +3,7 @@ module github.com/Stupnikjs/goscrapper
 go 1.20
 
 require (
-	github.com/chromedp/cdproto v0.0.0-20240501202034-ef67d660e9fd
+	github.com/chromedp/cdproto v0.0.0-20240721024200-dac8efcb39ce
 	github.com/chromedp/chromedp v0.9.5
 )
 

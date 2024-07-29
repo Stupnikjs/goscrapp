@@ -15,7 +15,7 @@ func main() {
 	var nodes []*cdp.Node
 	var selector string = `//ul[@class="tablelike"]//a/@href`
 	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
-
+	var urls = []string{}
 	// recuperer le nombres de pages en scrappant
 	for i := range [3]int{} {
 
@@ -23,7 +23,7 @@ func main() {
 			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
 		}
 
-		Scrap(selector, url, nodes)
+		Scrap(selector, url, nodes, &urls)
 
 	}
 
@@ -47,7 +47,7 @@ func Scrap(selector string, URL string, nodes []*cdp.Node, urls *[]string) *[]st
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &urls
+	return urls
 }
 
 func ProcessNodes(nodes []*cdp.Node, urls *[]string) *[]string {
