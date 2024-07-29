@@ -17,33 +17,29 @@ func main() {
 	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
 
 	// recuperer le nombres de pages en scrappant
-	for i := range [17]int{} {
+	for i := range [3]int{} {
 
-		urls := Scrap(selector, url, nodes, i)
-		fmt.Println(urls)
+		if i != 0 {
+			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
+		}
+
+		Scrap(selector, url, nodes)
 
 	}
 
 }
 
-func Scrap(selector string, URL string, nodes []*cdp.Node, i int) *[]string {
+func Scrap(selector string, URL string, nodes []*cdp.Node, urls *[]string) *[]string {
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
 	defer cancel()
-	var urls = []string{}
-	var url string = ""
-	if i == 0 {
-		url = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
-	}
-	url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
 
 	err := chromedp.Run(
 		ctx,
-		chromedp.Navigate(url),
+		chromedp.Navigate(URL),
 		chromedp.Nodes(selector, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
-
-			ProcessNodes(nodes, &urls)
+			ProcessNodes(nodes, urls)
 			return nil
 		}),
 	)
@@ -55,11 +51,12 @@ func Scrap(selector string, URL string, nodes []*cdp.Node, i int) *[]string {
 }
 
 func ProcessNodes(nodes []*cdp.Node, urls *[]string) *[]string {
-
+	newUrls := *urls
 	for _, node := range nodes {
 		if node.NodeType == cdp.NodeTypeElement {
-			*urls = append(*urls, node.Attributes[1])
+			newUrls = append(newUrls, node.Attributes[1])
 		}
 	}
-	return urls
+	fmt.Println(newUrls)
+	return &newUrls
 }
