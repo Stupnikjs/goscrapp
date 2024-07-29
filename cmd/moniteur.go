@@ -16,7 +16,7 @@ type Annonce struct {
 	Profession  string `json:"profession"`
 }
 
-func NewAnnonce(url string) *Annonce {
+func NewAnnonce(url string) {
 
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
@@ -37,16 +37,11 @@ func NewAnnonce(url string) *Annonce {
 	if err != nil {
 		fmt.Println(err)
 	}
-	return &Annonce{
-		Url: url,
-	}
 
 }
 
 func ProcessAnnonceNodes(nodes []*cdp.Node) {
 	for _, node := range nodes {
-		if node.NodeType == cdp.NodeTypeElement {
-			fmt.Println(node.Attributes[1])
-		}
+		fmt.Println(node.NodeValue)
 	}
 }
