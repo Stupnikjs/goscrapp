@@ -1,66 +1,45 @@
 package main
 
 import (
-	"context"
+	"bufio"
+	"encoding/json"
 	"fmt"
-	"log"
-	"time"
-
-	"github.com/chromedp/cdproto/cdp"
-	"github.com/chromedp/chromedp"
+	"io"
+	"os"
+	"strings"
 )
 
 func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print(">: ")
+	for scanner.Scan() {
 
-	var nodes []*cdp.Node
-	var selector string = `//ul[@class="tablelike"]//a/@href`
-	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
+		CommandParser(strings.TrimSpace(scanner.Text()))
+
+	}
+
+}
+
+func CommandParser(cmd string) {
+	switch cmd {
+	case "exit":
+		os.Exit(1)
+	case "moniteur":
+		urls := OpenUrls()
+		for _, u := range urls {
+			NewAnnonce(u)
+		}
+
+	default:
+		fmt.Print("unknown command")
+	}
+}
+
+func OpenUrls() []string {
 	var urls = []string{}
-
-	// recuperer le nombres de pages en scrappant
-
-	for i := range [10]int{} {
-
-		if i != 0 {
-			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
-		}
-
-		Scrap(selector, url, nodes, &urls)
-
-	}
-
-	for _, url := range urls {
-		NewAnnonce(url)
-	}
-}
-
-func Scrap(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
-	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
-	defer cancel()
-
-	err := chromedp.Run(
-		ctx,
-		chromedp.Navigate(URL),
-		chromedp.Nodes(selector, &nodes),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			ProcessNodes(nodes, urls)
-			return nil
-		}),
-	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-}
-
-func ProcessNodes(nodes []*cdp.Node, urls *[]string) {
-
-	for _, node := range nodes {
-		if node.NodeType == cdp.NodeTypeElement {
-			*urls = append(*urls, node.Attributes[1])
-		}
-	}
-
+	file, _ := os.Open("urls.txt")
+	defer file.Close()
+	bytes, _ := io.ReadAll(file)
+	_ = json.Unmarshal(bytes, &urls)
+	return urls[:2]
 }
