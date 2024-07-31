@@ -19,7 +19,7 @@ func NewAnnonce(url string) *Annonce {
 	var entreprise, date, jobtype, employementType, location string
 
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
+	ctx, cancel := context.WithTimeout(ctx, time.Minute*1)
 	defer cancel()
 
 	entrepriseSelector := `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`
@@ -60,7 +60,7 @@ func NewAnnonce(url string) *Annonce {
 
 func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
+	ctx, cancel := context.WithTimeout(ctx, time.Minute*1)
 	defer cancel()
 
 	err := chromedp.Run(
@@ -96,8 +96,8 @@ func GetMoniteurUrls() {
 	var urls = []string{}
 
 	// recuperer le nombres de pages en scrappant
-
-	for i := range [15]int{} {
+	pageNum := ScrapPageNumMoniteur()
+	for i := range make([]int, pageNum, 16) {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
 		}
@@ -111,7 +111,7 @@ func GetMoniteurUrls() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	file, err := os.Create("urls.json")
+	file, err := os.Create("moniteururls.json")
 
 	if err != nil {
 		fmt.Println(err)
@@ -124,4 +124,33 @@ func GetMoniteurUrls() {
 	}
 	defer file.Close()
 
+}
+
+func ScrapPageNumMoniteur() int {
+
+	URL := "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
+	ctx, _ := chromedp.NewContext(context.Background())
+	ctx, cancel := context.WithTimeout(ctx, time.Minute*1)
+	nodes := []*cdp.Node{}
+	defer cancel()
+	var pageNum int
+	selector := `//ul[@id="liste_pagination"]//*`
+	err := chromedp.Run(
+		ctx,
+		chromedp.Navigate(URL),
+		chromedp.Nodes(selector, &nodes),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			pageNum = ProcessPaginator(nodes)
+			return nil
+		}),
+	)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return pageNum
+}
+
+func ProcessPaginator(nodes []*cdp.Node) int {
+	return len(nodes) - 4
 }

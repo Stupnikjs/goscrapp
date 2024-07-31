@@ -20,17 +20,13 @@ func NewOcpAnnonce(url string) *Annonce {
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
 	defer cancel()
 
-	entrepriseSelector := `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`
-	dateSelector := `//span[@itemprop='datePosted']`
-	jobtypeSelector := `//span[@itemprop='occupationalCategory']`
-	employementTypeSelector := `//span[@itemprop='employmentType']`
-	locationSelector := `//span[@itemprop='jobLocation']//span`
+	jobtypeSelector := `//article//h2`
+	employementTypeSelector := `//li[@class='job_contract_type']/strong`
+	locationSelector := `//article//h3`
 
 	err := chromedp.Run(
 		ctx,
 		chromedp.Navigate(url),
-		chromedp.Text(entrepriseSelector, &entreprise, chromedp.NodeVisible),
-		chromedp.Text(dateSelector, &date, chromedp.NodeVisible),
 		chromedp.Text(jobtypeSelector, &jobtype, chromedp.NodeVisible),
 		chromedp.Text(employementTypeSelector, &employementType, chromedp.NodeVisible),
 		chromedp.Text(locationSelector, &location, chromedp.NodeVisible),
@@ -39,12 +35,6 @@ func NewOcpAnnonce(url string) *Annonce {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	fmt.Println("entreprise", entreprise)
-	fmt.Println("date", date)
-	fmt.Println("location", location)
-	fmt.Println("jobtype", jobtype)
-	fmt.Println(employementType)
 
 	return &Annonce{
 		Url:        url,
@@ -122,5 +112,9 @@ func GetOcpUrls() {
 		fmt.Println(err)
 	}
 	defer file.Close()
+
+}
+
+func ExtractDepartement() {
 
 }

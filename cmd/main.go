@@ -22,7 +22,7 @@ func main() {
 // get urls from urls.txt file
 func OpenUrls() []string {
 	var urls = []string{}
-	file, _ := os.Open("urls.txt")
+	file, _ := os.Open("moniteururls.json")
 	defer file.Close()
 	bytes, _ := io.ReadAll(file)
 	_ = json.Unmarshal(bytes, &urls)
