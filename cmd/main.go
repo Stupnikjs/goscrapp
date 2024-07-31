@@ -13,9 +13,8 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Print(">: ")
 	for scanner.Scan() {
-
 		CommandParser(strings.TrimSpace(scanner.Text()))
-
+		fmt.Print(">: ")
 	}
 
 }
@@ -27,5 +26,5 @@ func OpenUrls() []string {
 	defer file.Close()
 	bytes, _ := io.ReadAll(file)
 	_ = json.Unmarshal(bytes, &urls)
-	return urls
+	return urls[:20]
 }

@@ -24,8 +24,12 @@ func CommandParser(cmd string) {
 		bytes, _ := json.Marshal(annonces)
 		file.Write(bytes)
 
-	case "url":
+	case "murl":
 		GetMoniteurUrls()
+	case "ocpurl":
+		GetOcpUrls()
+	case "serve":
+		Server()
 	default:
 		fmt.Println("unknown command")
 

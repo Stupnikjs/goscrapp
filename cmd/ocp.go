@@ -12,9 +12,7 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-// creer un checkeur de doublons
-
-func NewAnnonce(url string) *Annonce {
+func NewOcpAnnonce(url string) *Annonce {
 
 	var entreprise, date, jobtype, employementType, location string
 
@@ -58,7 +56,7 @@ func NewAnnonce(url string) *Annonce {
 
 }
 
-func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
+func ScrapOcpUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
 	defer cancel()
@@ -68,7 +66,7 @@ func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 		chromedp.Navigate(URL),
 		chromedp.Nodes(selector, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			ProcessNodes(nodes, urls)
+			ProcessOcpNodes(nodes, urls)
 			return nil
 		}),
 	)
@@ -79,7 +77,7 @@ func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 
 }
 
-func ProcessNodes(nodes []*cdp.Node, urls *[]string) {
+func ProcessOcpNodes(nodes []*cdp.Node, urls *[]string) {
 
 	for _, node := range nodes {
 		if node.NodeType == cdp.NodeTypeElement {
@@ -89,17 +87,18 @@ func ProcessNodes(nodes []*cdp.Node, urls *[]string) {
 
 }
 
-func GetMoniteurUrls() {
+func GetOcpUrls() {
 	var nodes []*cdp.Node
-	var selector string = `//ul[@class="tablelike"]//a/@href`
-	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
+	var selector string = `//div[@class="offers"]//*//a/@href`
+	var url string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
 	var urls = []string{}
 
 	// recuperer le nombres de pages en scrappant
 
-	for i := range [15]int{} {
+	for i := range [10]int{} {
+
 		if i != 0 {
-			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
+			url = fmt.Sprintf("https://www.petitesannonces-ocp.fr/annonces/offres-emploi?page=%d", i+1)
 		}
 
 		ScrapUrls(selector, url, nodes, &urls)
@@ -111,7 +110,7 @@ func GetMoniteurUrls() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	file, err := os.Create("urls.json")
+	file, err := os.Create("ocpurls.json")
 
 	if err != nil {
 		fmt.Println(err)
