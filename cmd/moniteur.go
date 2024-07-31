@@ -14,27 +14,25 @@ import (
 
 type Annonce struct {
 	Url         string `json:"url"`
+	PubDate     string `json:"pubdate"`
 	Lieu        string `json:"lieu"`
 	Departement string `json:"Departement"`
 	Profession  string `json:"profession"`
+	Contrat     string `json:"contrat"`
 }
 
-func NewAnnonce(url string) {
+func scrapUrlsToJson(url string) {
 
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
 	defer cancel()
 
-	selector := `//ul[@class='liste_champs']//li/*`
-	nodes := []*cdp.Node{}
+	var urls = []string{}
+
 	err := chromedp.Run(
 		ctx,
 		chromedp.Navigate(url),
-		chromedp.Nodes(selector, &nodes),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			ProcessAnnonceNodes(nodes)
-			return nil
-		}),
+		chromedp.Evaluate(`document.querySelectorAll()`, &urls),
 	)
 
 	if err != nil {
@@ -43,32 +41,48 @@ func NewAnnonce(url string) {
 
 }
 
-func ProcessAnnonceNodes(nodes []*cdp.Node) {
-	for _, node := range nodes {
-		fmt.Println("atr", node.Attributes)
-		if node.NodeName == "span" {
-			fmt.Println("content", node.ContentDocument.NodeName)
-		}
+func NewAnnonce(url string) *Annonce {
 
-		fmt.Println("nodeName", node.NodeName)
-		itemprop, _ := node.Attribute("itemprop")
-		fmt.Println("itemprop", itemprop)
+	var entreprise, date, jobtype, employementType, location string
 
-		if itemprop == "jobLocation" {
-			for _, n := range node.Children {
-				fmt.Println("children", n.NodeValue)
-			}
-		}
-		if node.NodeName == "#text" {
-			fmt.Println("nodeValue", node.NodeValue)
-			fmt.Println("node value", node.Value)
-		}
+	ctx, _ := chromedp.NewContext(context.Background())
+	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
+	defer cancel()
 
-		if len(node.Children) > 0 {
-			ProcessAnnonceNodes(node.Children)
-		}
+	entrepriseSelector := `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`
+	dateSelector := `//span[@itemprop='datePosted']`
+	jobtypeSelector := `//span[@itemprop='occupationalCategory']`
+	employementTypeSelector := `//span[@itemprop='employmentType']`
+	locationSelector := `//span[@itemprop='jobLocation']//span`
 
+	err := chromedp.Run(
+		ctx,
+		chromedp.Navigate(url),
+		chromedp.Text(entrepriseSelector, &entreprise, chromedp.NodeVisible),
+		chromedp.Text(dateSelector, &date, chromedp.NodeVisible),
+		chromedp.Text(jobtypeSelector, &jobtype, chromedp.NodeVisible),
+		chromedp.Text(employementTypeSelector, &employementType, chromedp.NodeVisible),
+		chromedp.Text(locationSelector, &location, chromedp.NodeVisible),
+	)
+
+	if err != nil {
+		fmt.Println(err)
 	}
+
+	fmt.Println("entreprise", entreprise)
+	fmt.Println("date", date)
+	fmt.Println("location", location)
+	fmt.Println("jobtype", jobtype)
+	fmt.Println(employementType)
+
+	return &Annonce{
+		Url:        url,
+		PubDate:    date,
+		Lieu:       location,
+		Profession: jobtype,
+		Contrat:    employementType,
+	}
+
 }
 
 func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
@@ -125,7 +139,7 @@ func GetMoniteurUrls() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	file, err := os.Create("urls.txt")
+	file, err := os.Create("urls.json")
 
 	if err != nil {
 		fmt.Println(err)
