@@ -48,7 +48,7 @@ func ParseDep() {
 	newAnnonces := []Annonce{}
 	for _, a := range annonces {
 		for _, dep := range depKey {
-			if strings.Contains(a.Region, dep) {
+			if strings.Contains(a.Lieu, dep) {
 				a.Departement = Departements[dep]
 				fmt.Println(dep)
 			}
@@ -76,10 +76,7 @@ func RemoveOldAnnoncesJson(newAnnonces []Annonce) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	newFile.Write(bytes)
-	if err != nil {
-		fmt.Println(err)
-	}
+
 	newFile.Write(bytes)
 }
 
@@ -91,7 +88,7 @@ func ExtractDepartement(a Annonce) Annonce {
 			depStr := split[1][:2]
 			dep, err := strconv.Atoi(depStr)
 			if err != nil {
-				return Annonce{}
+				return a
 			}
 			a.Departement = dep
 		}

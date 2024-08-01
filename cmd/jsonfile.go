@@ -38,7 +38,7 @@ func CreateMoniteurAnnoncesFile() {
 		fmt.Println(i)
 		annonces = append(annonces, *annonce)
 	}
-	file, _ := os.Create("annonces.json")
+	file, _ := os.Create("moniteur_annonces.json")
 	defer file.Close()
 	bytes, _ := json.Marshal(annonces)
 	file.Write(bytes)
@@ -98,6 +98,7 @@ func MeltJsonAnnonces() {
 		fmt.Println(err)
 	}
 	annonce_final := append(annonces, annonces2...)
+	fmt.Println(annonce_final)
 	bytes, err := json.Marshal(annonce_final)
 	if err != nil {
 		fmt.Println(err)
