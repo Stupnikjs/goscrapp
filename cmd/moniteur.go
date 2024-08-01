@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/chromedp/cdproto/cdp"
@@ -19,7 +21,7 @@ func NewAnnonce(url string) *Annonce {
 	var entreprise, date, jobtype, employementType, location string
 
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*1)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 	defer cancel()
 
 	entrepriseSelector := `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`
@@ -40,13 +42,8 @@ func NewAnnonce(url string) *Annonce {
 
 	if err != nil {
 		fmt.Println(err)
+		fmt.Println(url)
 	}
-
-	fmt.Println("entreprise", entreprise)
-	fmt.Println("date", date)
-	fmt.Println("location", location)
-	fmt.Println("jobtype", jobtype)
-	fmt.Println(employementType)
 
 	return &Annonce{
 		Url:        url,
@@ -60,7 +57,7 @@ func NewAnnonce(url string) *Annonce {
 
 func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*1)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*20)
 	defer cancel()
 
 	err := chromedp.Run(
@@ -130,7 +127,7 @@ func ScrapPageNumMoniteur() int {
 
 	URL := "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*1)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*20)
 	nodes := []*cdp.Node{}
 	defer cancel()
 	var pageNum int
@@ -153,4 +150,21 @@ func ScrapPageNumMoniteur() int {
 
 func ProcessPaginator(nodes []*cdp.Node) int {
 	return len(nodes) - 4
+}
+
+func ExtractDepartement(a Annonce) Annonce {
+
+	split := strings.Split(a.Lieu, "(")
+	if len(split) > 1 {
+		if len(split[1]) >= 2 {
+			depStr := split[1][:2]
+			dep, err := strconv.Atoi(depStr)
+			if err != nil {
+				return Annonce{}
+			}
+			a.Departement = dep
+		}
+	}
+
+	return a
 }

@@ -10,7 +10,7 @@ type Annonce struct {
 	Url         string `json:"url"`
 	PubDate     string `json:"pubdate"`
 	Lieu        string `json:"lieu"`
-	Departement string `json:"Departement"`
+	Departement int    `json:"departement"`
 	Profession  string `json:"profession"`
 	Contrat     string `json:"contrat"`
 }

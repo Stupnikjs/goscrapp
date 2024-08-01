@@ -19,6 +19,10 @@ func main() {
 
 }
 
+func Exit() {
+	os.Exit(1)
+}
+
 // get urls from urls.txt file
 func OpenUrls() []string {
 	var urls = []string{}
@@ -26,5 +30,19 @@ func OpenUrls() []string {
 	defer file.Close()
 	bytes, _ := io.ReadAll(file)
 	_ = json.Unmarshal(bytes, &urls)
-	return urls[:20]
+	fmt.Println("urls len", len(urls))
+	return urls
+}
+
+func CreateAnnoncesFile() {
+	urls := OpenUrls()
+	annonces := []Annonce{}
+	for _, u := range urls {
+		annonce := NewAnnonce(u)
+		annonces = append(annonces, *annonce)
+	}
+	file, _ := os.Create("annonces.json")
+	defer file.Close()
+	bytes, _ := json.Marshal(annonces)
+	file.Write(bytes)
 }

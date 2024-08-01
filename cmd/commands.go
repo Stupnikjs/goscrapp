@@ -6,32 +6,45 @@ import (
 	"os"
 )
 
+var commandsMap = map[string]func(){
+	"exit": Exit,
+	"an":   CreateAnnoncesFile,
+	"murl": GetMoniteurUrls,
+	"ourl": GetOcpUrls,
+	"dep":  ParseLieu,
+}
+
 func CommandParser(cmd string) {
-	switch cmd {
-	case "exit":
-		os.Exit(1)
-	case "s":
-		urls := OpenUrls()
-		annonces := []Annonce{}
-		for _, u := range urls {
-
-			annonce := NewAnnonce(u)
-			annonces = append(annonces, *annonce)
-
-		}
-		file, _ := os.Create("annonces.json")
-		defer file.Close()
-		bytes, _ := json.Marshal(annonces)
-		file.Write(bytes)
-
-	case "murl":
-		GetMoniteurUrls()
-	case "ocpurl":
-		GetOcpUrls()
-	case "serve":
-		Server()
-	default:
-		fmt.Println("unknown command")
-
+	f, ok := commandsMap[cmd]
+	if ok {
+		f()
+	} else {
+		fmt.Print("unknown command")
 	}
+}
+
+func ParseLieu() {
+	annonces := GetAllAnnnonces()
+	newAnnonces := []Annonce{}
+	for _, a := range annonces {
+		new := ExtractDepartement(a)
+		newAnnonces = append(newAnnonces, new)
+	}
+
+	os.Remove("annonces.json")
+
+	newFile, err := os.Create("annonces.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer newFile.Close()
+	if err != nil {
+		fmt.Println(err)
+	}
+	bytes, err := json.Marshal(newAnnonces)
+	if err != nil {
+		fmt.Println(err)
+	}
+	newFile.Write(bytes)
+
 }

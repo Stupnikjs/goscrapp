@@ -14,7 +14,7 @@ import (
 
 func NewOcpAnnonce(url string) *Annonce {
 
-	var entreprise, date, jobtype, employementType, location string
+	var date, jobtype, employementType, location string
 
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
@@ -112,9 +112,5 @@ func GetOcpUrls() {
 		fmt.Println(err)
 	}
 	defer file.Close()
-
-}
-
-func ExtractDepartement() {
 
 }
