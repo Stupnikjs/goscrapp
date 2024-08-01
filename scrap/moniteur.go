@@ -1,4 +1,4 @@
-package main
+package scrap
 
 import (
 	"context"
@@ -6,22 +6,22 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"strings"
+
 	"time"
 
+	"github.com/Stupnikjs/goscrapp/data"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
 
 // creer un checkeur de doublons
 
-func NewAnnonce(url string) *Annonce {
+func NewMoniteurAnnonce(url string) *data.Annonce {
 
 	var entreprise, date, jobtype, employementType, location string
 
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*7)
 	defer cancel()
 
 	entrepriseSelector := `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`
@@ -42,13 +42,12 @@ func NewAnnonce(url string) *Annonce {
 
 	if err != nil {
 		fmt.Println(err)
-		fmt.Println(url)
 	}
 
-	return &Annonce{
+	return &data.Annonce{
 		Url:        url,
 		PubDate:    date,
-		Lieu:       location,
+		Region:     location,
 		Profession: jobtype,
 		Contrat:    employementType,
 	}
@@ -65,23 +64,17 @@ func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 		chromedp.Navigate(URL),
 		chromedp.Nodes(selector, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			ProcessNodes(nodes, urls)
+			for _, node := range nodes {
+				if node.NodeType == cdp.NodeTypeElement {
+					*urls = append(*urls, node.Attributes[1])
+				}
+			}
 			return nil
 		}),
 	)
 
 	if err != nil {
 		log.Fatal(err)
-	}
-
-}
-
-func ProcessNodes(nodes []*cdp.Node, urls *[]string) {
-
-	for _, node := range nodes {
-		if node.NodeType == cdp.NodeTypeElement {
-			*urls = append(*urls, node.Attributes[1])
-		}
 	}
 
 }
@@ -150,21 +143,4 @@ func ScrapPageNumMoniteur() int {
 
 func ProcessPaginator(nodes []*cdp.Node) int {
 	return len(nodes) - 4
-}
-
-func ExtractDepartement(a Annonce) Annonce {
-
-	split := strings.Split(a.Region, "(")
-	if len(split) > 1 {
-		if len(split[1]) >= 2 {
-			depStr := split[1][:2]
-			dep, err := strconv.Atoi(depStr)
-			if err != nil {
-				return Annonce{}
-			}
-			a.Departement = dep
-		}
-	}
-
-	return a
 }

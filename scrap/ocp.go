@@ -1,4 +1,4 @@
-package main
+package scrap
 
 import (
 	"context"
@@ -6,15 +6,17 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
+	"github.com/Stupnikjs/goscrapp/data"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
 
-func NewOcpAnnonce(url string) *Annonce {
+func NewOcpAnnonce(url string) *data.Annonce {
 
-	var date, jobtype, employementType, location string
+	var date, jobtype, employementType, location, description string
 
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*8)
@@ -23,6 +25,7 @@ func NewOcpAnnonce(url string) *Annonce {
 	jobtypeSelector := `//article//h2`
 	employementTypeSelector := `//li[@class='job_contract_type']/strong`
 	locationSelector := `//article//h3`
+	descriptionSelector := `//p[@id="description"]`
 
 	err := chromedp.Run(
 		ctx,
@@ -30,13 +33,14 @@ func NewOcpAnnonce(url string) *Annonce {
 		chromedp.Text(jobtypeSelector, &jobtype, chromedp.NodeVisible),
 		chromedp.Text(employementTypeSelector, &employementType, chromedp.NodeVisible),
 		chromedp.Text(locationSelector, &location, chromedp.NodeVisible),
+		chromedp.Text(descriptionSelector, &description, chromedp.NodeVisible),
 	)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	return &Annonce{
+	return &data.Annonce{
 		Url:        url,
 		PubDate:    date,
 		Lieu:       location,
@@ -79,20 +83,20 @@ func ProcessOcpNodes(nodes []*cdp.Node, urls *[]string) {
 
 func GetOcpUrls() {
 	var nodes []*cdp.Node
-	var selector string = `//div[@class="offers"]//*//a/@href`
+	var selector string = `//div[contains(@class, 'offer') and contains(@class, 'theme_2')]//a/@href`
 	var url string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
 	var urls = []string{}
 
 	// recuperer le nombres de pages en scrappant
 
-	for i := range [10]int{} {
+	num := GetOcpPaginatorNum(url)
 
+	for i := range make([]int, num) {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.petitesannonces-ocp.fr/annonces/offres-emploi?page=%d", i+1)
 		}
-
-		ScrapUrls(selector, url, nodes, &urls)
-
+		print("here")
+		ScrapOcpUrls(selector, url, nodes, &urls)
 	}
 
 	bytes, err := json.Marshal(urls)
@@ -115,18 +119,38 @@ func GetOcpUrls() {
 
 }
 
-func CreateOcpAnnoncesFile() {
+func GetOcpPaginatorNum(url string) int {
 
-	urls := OpenOcpUrls()
-	annonces := []Annonce{}
-	for _, u := range urls {
-		annonce := NewOcpAnnonce(u)
-		fmt.Println(annonce)
-		annonces = append(annonces, *annonce)
+	ctx, _ := chromedp.NewContext(context.Background())
+	ctx, cancel := context.WithTimeout(ctx, time.Second*15)
+	defer cancel()
+
+	selectorPaginator := `//li[@class="last_page"]//a/@href`
+	var pageNum string
+	var pagenodes []*cdp.Node
+	err := chromedp.Run(
+		ctx,
+		chromedp.Navigate(url),
+		chromedp.Nodes(selectorPaginator, &pagenodes),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			for _, n := range pagenodes {
+				if len(n.Attributes) > 0 {
+					pageNum = n.Attributes[1]
+					fmt.Println(n)
+				}
+			}
+			return nil
+		}),
+	)
+
+	if err != nil {
+		fmt.Println(err)
 	}
-	file, _ := os.Create("ocp_annonces.json")
-	defer file.Close()
-	bytes, _ := json.Marshal(annonces)
-	file.Write(bytes)
+	strPage := pageNum[len(pageNum)-2:]
+	pageInt, err := strconv.Atoi(strPage)
+	if err != nil {
+		fmt.Println(err)
+	}
 
+	return pageInt
 }
