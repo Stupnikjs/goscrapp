@@ -7,11 +7,12 @@ import (
 )
 
 var commandsMap = map[string]func(){
-	"exit": Exit,
-	"an":   CreateAnnoncesFile,
-	"murl": GetMoniteurUrls,
-	"ourl": GetOcpUrls,
-	"dep":  ParseLieu,
+	"exit":   Exit,
+	"anmoni": CreateMoniteurAnnoncesFile,
+	"anocp":  CreateOcpAnnoncesFile,
+	"murl":   GetMoniteurUrls,
+	"ourl":   GetOcpUrls,
+	"dep":    ParseLieu,
 }
 
 func CommandParser(cmd string) {
@@ -19,7 +20,7 @@ func CommandParser(cmd string) {
 	if ok {
 		f()
 	} else {
-		fmt.Print("unknown command")
+		fmt.Println("unknown command")
 	}
 }
 

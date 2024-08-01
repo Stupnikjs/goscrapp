@@ -154,7 +154,7 @@ func ProcessPaginator(nodes []*cdp.Node) int {
 
 func ExtractDepartement(a Annonce) Annonce {
 
-	split := strings.Split(a.Lieu, "(")
+	split := strings.Split(a.Region, "(")
 	if len(split) > 1 {
 		if len(split[1]) >= 2 {
 			depStr := split[1][:2]

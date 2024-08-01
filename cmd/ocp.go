@@ -17,7 +17,7 @@ func NewOcpAnnonce(url string) *Annonce {
 	var date, jobtype, employementType, location string
 
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*8)
 	defer cancel()
 
 	jobtypeSelector := `//article//h2`
@@ -48,7 +48,7 @@ func NewOcpAnnonce(url string) *Annonce {
 
 func ScrapOcpUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Minute*3)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*20)
 	defer cancel()
 
 	err := chromedp.Run(
@@ -112,5 +112,21 @@ func GetOcpUrls() {
 		fmt.Println(err)
 	}
 	defer file.Close()
+
+}
+
+func CreateOcpAnnoncesFile() {
+
+	urls := OpenOcpUrls()
+	annonces := []Annonce{}
+	for _, u := range urls {
+		annonce := NewOcpAnnonce(u)
+		fmt.Println(annonce)
+		annonces = append(annonces, *annonce)
+	}
+	file, _ := os.Create("ocp_annonces.json")
+	defer file.Close()
+	bytes, _ := json.Marshal(annonces)
+	file.Write(bytes)
 
 }

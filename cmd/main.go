@@ -24,7 +24,7 @@ func Exit() {
 }
 
 // get urls from urls.txt file
-func OpenUrls() []string {
+func OpenMoniteurUrls() []string {
 	var urls = []string{}
 	file, _ := os.Open("moniteururls.json")
 	defer file.Close()
@@ -33,9 +33,18 @@ func OpenUrls() []string {
 	fmt.Println("urls len", len(urls))
 	return urls
 }
+func OpenOcpUrls() []string {
+	var urls = []string{}
+	file, _ := os.Open("ocpurls.json")
+	defer file.Close()
+	bytes, _ := io.ReadAll(file)
+	_ = json.Unmarshal(bytes, &urls)
+	fmt.Println("urls len", len(urls))
+	return urls
+}
 
-func CreateAnnoncesFile() {
-	urls := OpenUrls()
+func CreateMoniteurAnnoncesFile() {
+	urls := OpenMoniteurUrls()
 	annonces := []Annonce{}
 	for _, u := range urls {
 		annonce := NewAnnonce(u)
