@@ -10,24 +10,27 @@ import (
 )
 
 type Annonce struct {
+	Id          string `json:"id"`
+	Digest      string `json:"digest"`
 	Url         string `json:"url"`
 	PubDate     string `json:"pubdate"`
+	Ville       string `json:"ville"`
 	Lieu        string `json:"lieu"`
-	Region      string `json:"region"`
 	Departement int    `json:"departement"`
 	Description string `json:"description"`
 	Profession  string `json:"profession"`
 	Contrat     string `json:"contrat"`
+	Created_at  string `json:"created_at"`
 }
 
 func GetAllAnnnonces() []Annonce {
 
-	var urls = []Annonce{}
+	var annonces = []Annonce{}
 	file, _ := os.Open("annonces.json")
 	defer file.Close()
 	bytes, _ := io.ReadAll(file)
-	_ = json.Unmarshal(bytes, &urls)
-	return urls
+	_ = json.Unmarshal(bytes, &annonces)
+	return annonces
 
 }
 
@@ -39,7 +42,6 @@ func ParseLieu() {
 		newAnnonces = append(newAnnonces, new)
 	}
 	RemoveOldAnnoncesJson(newAnnonces)
-
 }
 
 func ParseDep() {
@@ -60,29 +62,9 @@ func ParseDep() {
 
 }
 
-func RemoveOldAnnoncesJson(newAnnonces []Annonce) {
-
-	os.Remove("annonces.json")
-
-	newFile, err := os.Create("annonces.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer newFile.Close()
-	if err != nil {
-		fmt.Println(err)
-	}
-	bytes, err := json.Marshal(newAnnonces)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	newFile.Write(bytes)
-}
-
 func ExtractDepartement(a Annonce) Annonce {
 
-	split := strings.Split(a.Region, "(")
+	split := strings.Split(a.Lieu, "(")
 	if len(split) > 1 {
 		if len(split[1]) >= 2 {
 			depStr := split[1][:2]

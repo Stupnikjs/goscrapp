@@ -9,12 +9,12 @@ import (
 
 var commandsMap = map[string]func(){
 	"exit":     Exit,
-	"anmoni":   CreateMoniteurAnnoncesFile,
-	"anocp":    CreateOcpAnnoncesFile,
+	"anmoni":   scrap.CreateMoniteurAnnoncesFile,
+	"anocp":    scrap.CreateOcpAnnoncesFile,
 	"murl":     scrap.GetMoniteurUrls,
 	"ourl":     scrap.GetOcpUrls,
 	"dep":      data.ParseLieu,
-	"melt":     MeltJsonAnnonces,
+	"melt":     data.MeltJsonAnnonces,
 	"parsedep": data.ParseDep,
 }
 

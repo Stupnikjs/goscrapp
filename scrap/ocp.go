@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 	"time"
@@ -66,7 +65,7 @@ func ScrapOcpUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string
 	)
 
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 }
@@ -87,34 +86,30 @@ func GetOcpUrls() {
 	var url string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
 	var urls = []string{}
 
-	// recuperer le nombres de pages en scrappant
-
 	num := GetOcpPaginatorNum(url)
 
 	for i := range make([]int, num) {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.petitesannonces-ocp.fr/annonces/offres-emploi?page=%d", i+1)
 		}
-		print("here")
 		ScrapOcpUrls(selector, url, nodes, &urls)
 	}
 
 	bytes, err := json.Marshal(urls)
-
 	if err != nil {
 		fmt.Println(err)
 	}
-	file, err := os.Create("ocpurls.json")
 
+	file, err := os.Create("ocpurls.json")
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	_, err = file.Write(bytes)
-
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	defer file.Close()
 
 }
@@ -136,7 +131,6 @@ func GetOcpPaginatorNum(url string) int {
 			for _, n := range pagenodes {
 				if len(n.Attributes) > 0 {
 					pageNum = n.Attributes[1]
-					fmt.Println(n)
 				}
 			}
 			return nil
@@ -146,6 +140,7 @@ func GetOcpPaginatorNum(url string) int {
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	strPage := pageNum[len(pageNum)-2:]
 	pageInt, err := strconv.Atoi(strPage)
 	if err != nil {

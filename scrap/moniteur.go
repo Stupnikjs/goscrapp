@@ -47,9 +47,10 @@ func NewMoniteurAnnonce(url string) *data.Annonce {
 	return &data.Annonce{
 		Url:        url,
 		PubDate:    date,
-		Region:     location,
+		Lieu:       location,
 		Profession: jobtype,
 		Contrat:    employementType,
+		Created_at: time.Now().GoString(),
 	}
 
 }
