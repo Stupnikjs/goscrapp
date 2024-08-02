@@ -8,14 +8,12 @@ import (
 )
 
 var commandsMap = map[string]func(){
-	"exit":     Exit,
-	"anmoni":   scrap.CreateMoniteurAnnoncesFile,
-	"anocp":    scrap.CreateOcpAnnoncesFile,
-	"murl":     scrap.GetMoniteurUrls,
-	"ourl":     scrap.GetOcpUrls,
-	"dep":      data.ParseLieu,
-	"melt":     data.MeltJsonAnnonces,
-	"parsedep": data.ParseDep,
+	"exit":   Exit,
+	"anmoni": scrap.CreateMoniteurAnnoncesFile,
+	"anocp":  scrap.CreateOcpAnnoncesFile,
+	"murl":   scrap.GetMoniteurUrls,
+	"ourl":   scrap.GetOcpUrls,
+	"melt":   data.MeltJsonAnnonces,
 }
 
 func CommandParser(cmd string) {

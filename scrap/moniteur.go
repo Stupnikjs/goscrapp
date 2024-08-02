@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
-
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
@@ -45,12 +45,13 @@ func NewMoniteurAnnonce(url string) *data.Annonce {
 	}
 
 	return &data.Annonce{
-		Url:        url,
-		PubDate:    date,
-		Lieu:       location,
-		Profession: jobtype,
-		Contrat:    employementType,
-		Created_at: time.Now().GoString(),
+		Url:         url,
+		PubDate:     date,
+		Lieu:        location,
+		Profession:  jobtype,
+		Departement: extractDepartement(location),
+		Contrat:     employementType,
+		Created_at:  time.Now().Format("2022-02-06"),
 	}
 
 }
@@ -73,43 +74,39 @@ func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 			return nil
 		}),
 	)
-
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 }
 
 func GetMoniteurUrls() {
+
 	var nodes []*cdp.Node
 	var selector string = `//ul[@class="tablelike"]//a/@href`
 	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
 	var urls = []string{}
 
-	// recuperer le nombres de pages en scrappant
 	pageNum := ScrapPageNumMoniteur()
 	for i := range make([]int, pageNum, 16) {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
 		}
-
 		ScrapUrls(selector, url, nodes, &urls)
-
 	}
 
+	fmt.Println(urls)
 	bytes, err := json.Marshal(urls)
-
 	if err != nil {
 		fmt.Println(err)
 	}
-	file, err := os.Create("moniteururls.json")
 
+	file, err := os.Create("moniteururls.json")
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	_, err = file.Write(bytes)
-
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -133,8 +130,8 @@ func ScrapPageNumMoniteur() int {
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			pageNum = ProcessPaginator(nodes)
 			return nil
-		}),
-	)
+		}))
+
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -144,4 +141,21 @@ func ScrapPageNumMoniteur() int {
 
 func ProcessPaginator(nodes []*cdp.Node) int {
 	return len(nodes) - 4
+}
+
+func extractDepartement(str string) int {
+
+	split := strings.Split(str, "(")
+	if len(split) > 1 {
+		if len(split[1]) >= 2 {
+			depStr := split[1][:2]
+			dep, err := strconv.Atoi(depStr)
+			if err != nil {
+				return 0
+			}
+			return dep
+		}
+	}
+
+	return 0
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
@@ -40,11 +41,13 @@ func NewOcpAnnonce(url string) *data.Annonce {
 	}
 
 	return &data.Annonce{
-		Url:        url,
-		PubDate:    date,
-		Lieu:       location,
-		Profession: jobtype,
-		Contrat:    employementType,
+		Url:         url,
+		PubDate:     date,
+		Lieu:        location,
+		Departement: parseDep(location),
+		Profession:  jobtype,
+		Contrat:     employementType,
+		Created_at:  time.Now().Format("2022-02-06"),
 	}
 
 }
@@ -148,4 +151,21 @@ func GetOcpPaginatorNum(url string) int {
 	}
 
 	return pageInt
+}
+
+func parseDep(str string) int {
+	split := strings.Split(str, ",")
+
+	if len(split) < 1 {
+		return 0
+	}
+
+	for dep := range data.Departements {
+		if strings.Contains(dep, strings.TrimSpace(split[1])) && len(dep) == len(strings.TrimSpace(split[1])) {
+			fmt.Println(split[1], dep, data.Departements[dep])
+			return data.Departements[dep]
+
+		}
+	}
+	return 0
 }

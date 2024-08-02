@@ -2,11 +2,8 @@ package data
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
-	"strconv"
-	"strings"
 )
 
 type Annonce struct {
@@ -32,49 +29,4 @@ func GetAllAnnnonces() []Annonce {
 	_ = json.Unmarshal(bytes, &annonces)
 	return annonces
 
-}
-
-func ParseLieu() {
-	annonces := GetAllAnnnonces()
-	newAnnonces := []Annonce{}
-	for _, a := range annonces {
-		new := ExtractDepartement(a)
-		newAnnonces = append(newAnnonces, new)
-	}
-	RemoveOldAnnoncesJson(newAnnonces)
-}
-
-func ParseDep() {
-	depKey := GetKeys(Departements)
-	annonces := GetAllAnnnonces()
-	newAnnonces := []Annonce{}
-	for _, a := range annonces {
-		for _, dep := range depKey {
-			if strings.Contains(a.Lieu, dep) {
-				a.Departement = Departements[dep]
-				fmt.Println(dep)
-			}
-		}
-		newAnnonces = append(newAnnonces, a)
-
-	}
-	RemoveOldAnnoncesJson(newAnnonces)
-
-}
-
-func ExtractDepartement(a Annonce) Annonce {
-
-	split := strings.Split(a.Lieu, "(")
-	if len(split) > 1 {
-		if len(split[1]) >= 2 {
-			depStr := split[1][:2]
-			dep, err := strconv.Atoi(depStr)
-			if err != nil {
-				return a
-			}
-			a.Departement = dep
-		}
-	}
-
-	return a
 }
