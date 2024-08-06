@@ -14,6 +14,14 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
+var Ocp ScrapperPharma
+
+var OcpSelectors = Selectors{
+	LieuSelector:    `//article//h3`,
+	EmploiSelector:  `//article//h2`,
+	ContratSelector: `//li[@class='job_contract_type']/strong`,
+}
+
 func NewOcpAnnonce(url string) *data.Annonce {
 
 	var date, jobtype, employementType, location, description string
@@ -22,9 +30,6 @@ func NewOcpAnnonce(url string) *data.Annonce {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*8)
 	defer cancel()
 
-	jobtypeSelector := `//article//h2`
-	employementTypeSelector := `//li[@class='job_contract_type']/strong`
-	locationSelector := `//article//h3`
 	descriptionSelector := `//p[@id="description"]`
 
 	err := chromedp.Run(

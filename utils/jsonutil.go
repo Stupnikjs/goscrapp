@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func arrToJson[T any](arr []T, filename string) error {
+func ArrToJson[T any](arr []T, filename string) error {
 
 	bytes, err := json.Marshal(arr)
 	if err != nil {

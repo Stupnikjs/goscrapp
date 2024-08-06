@@ -21,6 +21,6 @@ type ScrapperPharma struct {
 
 type Scrapper interface {
 	ScrappAnnonce(Selectors) []data.Annonce
-	ScrappUrls(string) []string
+	ScrappUrls(string)
 	ParseDep(string) int
 }

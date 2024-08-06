@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
+	"github.com/Stupnikjs/goscrapp/utils"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
@@ -30,7 +31,7 @@ func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
 		var entreprise, date, jobtype, employementType, location string
 
 		ctx, _ := chromedp.NewContext(context.Background())
-		ctx, cancel := context.WithTimeout(ctx, time.Second*7)
+		ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 		defer cancel()
 
 		err := chromedp.Run(
@@ -62,9 +63,8 @@ func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
 
 }
 
-func (m *ScrapperPharma) ScrappUrls() []string {
+func (m *ScrapperPharma) ScrappUrls() {
 	var selector string = `//ul[@class="tablelike"]//a/@href`
-	var urls = []string{}
 	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
 	pageNum := m.ScrapPageNumMoniteur()
 
@@ -86,7 +86,7 @@ func (m *ScrapperPharma) ScrappUrls() []string {
 			chromedp.ActionFunc(func(ctx context.Context) error {
 				for _, node := range nodes {
 					if node.NodeType == cdp.NodeTypeElement {
-						urls = append(urls, node.Attributes[1])
+						m.Urls = append(m.Urls, node.Attributes[1])
 					}
 				}
 				return nil
@@ -96,7 +96,6 @@ func (m *ScrapperPharma) ScrappUrls() []string {
 			fmt.Println(err)
 		}
 	}
-	return urls
 
 }
 
@@ -147,12 +146,18 @@ func (m *ScrapperPharma) ExtractDepartement(str string) int {
 }
 
 func (m *ScrapperPharma) WrapperScrappUrl() {
-	urls := m.ScrappUrls()
-	fmt.Println(urls)
-
+	m.ScrappUrls()
+	fmt.Println(m.Urls)
 }
 func (m *ScrapperPharma) WrapperScrappAnnonces() {
+	if len(m.Urls) == 0 {
+		m.ScrappUrls()
+		utils.ArrToJson(m.Urls, "moniteur_urls.json")
+		fmt.Println(m.Urls)
+	}
 	annonces := m.ScrappAnnonces(m.Selectors)
-	utils.arrToJson(annonces, "moniteur.json")
+
+	err := utils.ArrToJson(annonces, "moniteur.json")
+	fmt.Println(err)
 
 }
