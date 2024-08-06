@@ -5,21 +5,22 @@ import (
 )
 
 type Selectors struct {
-	DateSelector    string
-	LieuSelector    string
-	EmploiSelector  string
-	ContratSelector string
-	UrlSelector     string
+	EntepriseSelector string
+	DateSelector      string
+	LieuSelector      string
+	EmploiSelector    string
+	ContratSelector   string
+	UrlSelector       string
 }
 
-type ScrapperStruct struct {
+type ScrapperPharma struct {
 	Selectors Selectors
 	Annonces  []data.Annonce
 	Urls      []string
 }
 
 type Scrapper interface {
-	ScrappAnnonce()
-	ScrappUrls()
-	ParseDep()
+	ScrappAnnonce(Selectors) []data.Annonce
+	ScrappUrls(string) []string
+	ParseDep(string) int
 }

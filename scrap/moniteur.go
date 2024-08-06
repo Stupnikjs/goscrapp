@@ -16,54 +16,64 @@ import (
 
 // creer un checkeur de doublons
 
-func NewMoniteurAnnonce(url string) *data.Annonce {
+var Moniteur = ScrapperPharma{}
 
-	var entreprise, date, jobtype, employementType, location string
+var MoniteurSelectors = Selectors{
+	EntepriseSelector: `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`,
+	DateSelector:      `//span[@itemprop='datePosted']`,
+	EmploiSelector:    `//span[@itemprop='occupationalCategory']`,
+	ContratSelector:   `//span[@itemprop='employmentType']`,
+	LieuSelector:      `//span[@itemprop='jobLocation']//span`,
+}
 
-	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Second*7)
-	defer cancel()
+func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
+	annonces := []data.Annonce{}
+	for _, url := range m.Urls {
+		var entreprise, date, jobtype, employementType, location string
 
-	entrepriseSelector := `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`
-	dateSelector := `//span[@itemprop='datePosted']`
-	jobtypeSelector := `//span[@itemprop='occupationalCategory']`
-	employementTypeSelector := `//span[@itemprop='employmentType']`
-	locationSelector := `//span[@itemprop='jobLocation']//span`
+		ctx, _ := chromedp.NewContext(context.Background())
+		ctx, cancel := context.WithTimeout(ctx, time.Second*7)
+		defer cancel()
 
-	err := chromedp.Run(
-		ctx,
-		chromedp.Navigate(url),
-		chromedp.Text(entrepriseSelector, &entreprise, chromedp.NodeVisible),
-		chromedp.Text(dateSelector, &date, chromedp.NodeVisible),
-		chromedp.Text(jobtypeSelector, &jobtype, chromedp.NodeVisible),
-		chromedp.Text(employementTypeSelector, &employementType, chromedp.NodeVisible),
-		chromedp.Text(locationSelector, &location, chromedp.NodeVisible),
-	)
+		err := chromedp.Run(
+			ctx,
+			chromedp.Navigate(url),
+			chromedp.Text(sels.EntepriseSelector, &entreprise, chromedp.NodeVisible),
+			chromedp.Text(sels.DateSelector, &date, chromedp.NodeVisible),
+			chromedp.Text(sels.EmploiSelector, &jobtype, chromedp.NodeVisible),
+			chromedp.Text(sels.ContratSelector, &employementType, chromedp.NodeVisible),
+			chromedp.Text(sels.LieuSelector, &location, chromedp.NodeVisible),
+		)
 
-	if err != nil {
-		fmt.Println(err)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		an := data.Annonce{
+			Url:         url,
+			PubDate:     date,
+			Lieu:        location,
+			Profession:  jobtype,
+			Departement: extractDepartement(location),
+			Contrat:     employementType,
+			Created_at:  time.Now().Format("2022-02-06"),
+		}
+		annonces = append(annonces, an)
 	}
-
-	return &data.Annonce{
-		Url:         url,
-		PubDate:     date,
-		Lieu:        location,
-		Profession:  jobtype,
-		Departement: extractDepartement(location),
-		Contrat:     employementType,
-		Created_at:  time.Now().Format("2022-02-06"),
-	}
+	return annonces
 
 }
 
-func ScrapUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
+func (m *ScrapperPharma) ScrappUrls() {
+	urls := []string{}
+	var nodes []*cdp.Node
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*20)
 	defer cancel()
 
 	err := chromedp.Run(
 		ctx,
-		chromedp.Navigate(URL),
+		chromedp.Navigate(url),
 		chromedp.Nodes(selector, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			for _, node := range nodes {
@@ -92,7 +102,7 @@ func GetMoniteurUrls() {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
 		}
-		ScrapUrls(selector, url, nodes, &urls)
+		ScrappUrls(selector, url, nodes, &urls)
 	}
 
 	fmt.Println(urls)
@@ -112,6 +122,10 @@ func GetMoniteurUrls() {
 	}
 	defer file.Close()
 
+}
+
+func ScrappUrls(selector, url string, nodes []*cdp.Node, string *[]string) {
+	panic("unimplemented")
 }
 
 func ScrapPageNumMoniteur() int {
