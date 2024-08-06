@@ -22,7 +22,7 @@ var OcpSelectors = Selectors{
 	ContratSelector: `//li[@class='job_contract_type']/strong`,
 }
 
-func (m *ScrapperPharma) (url string) data.Annonce {
+func (m *Scrapper) GetAnnonce(url string) data.Annonce {
 
 	var date, jobtype, employementType, location, description string
 
