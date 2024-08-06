@@ -2,9 +2,7 @@ package scrap
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -28,7 +26,7 @@ var MoniteurSelectors = Selectors{
 
 func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
 	annonces := []data.Annonce{}
-	for _, url := range m.Urls {
+	for _, url := range m.Urls[:5] {
 		var entreprise, date, jobtype, employementType, location string
 
 		ctx, _ := chromedp.NewContext(context.Background())
@@ -49,86 +47,60 @@ func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
 			fmt.Println(err)
 		}
 
-		an := data.Annonce{
+		a := data.Annonce{
 			Url:         url,
 			PubDate:     date,
 			Lieu:        location,
 			Profession:  jobtype,
-			Departement: extractDepartement(location),
+			Departement: m.ExtractDepartement(location),
 			Contrat:     employementType,
 			Created_at:  time.Now().Format("2022-02-06"),
 		}
-		annonces = append(annonces, an)
+		annonces = append(annonces, a)
 	}
 	return annonces
 
 }
 
-func (m *ScrapperPharma) ScrappUrls() {
-	urls := []string{}
-	var nodes []*cdp.Node
-	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Second*20)
-	defer cancel()
-
-	err := chromedp.Run(
-		ctx,
-		chromedp.Navigate(url),
-		chromedp.Nodes(selector, &nodes),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			for _, node := range nodes {
-				if node.NodeType == cdp.NodeTypeElement {
-					*urls = append(*urls, node.Attributes[1])
-				}
-			}
-			return nil
-		}),
-	)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-}
-
-func GetMoniteurUrls() {
-
-	var nodes []*cdp.Node
+func (m *ScrapperPharma) ScrappUrls() []string {
 	var selector string = `//ul[@class="tablelike"]//a/@href`
-	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
 	var urls = []string{}
+	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
+	pageNum := m.ScrapPageNumMoniteur()
 
-	pageNum := ScrapPageNumMoniteur()
 	for i := range make([]int, pageNum, 16) {
+
 		if i != 0 {
 			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
 		}
-		ScrappUrls(selector, url, nodes, &urls)
-	}
 
-	fmt.Println(urls)
-	bytes, err := json.Marshal(urls)
-	if err != nil {
-		fmt.Println(err)
-	}
+		var nodes []*cdp.Node
+		ctx, _ := chromedp.NewContext(context.Background())
+		ctx, cancel := context.WithTimeout(ctx, time.Second*20)
+		defer cancel()
 
-	file, err := os.Create("moniteururls.json")
-	if err != nil {
-		fmt.Println(err)
+		err := chromedp.Run(
+			ctx,
+			chromedp.Navigate(url),
+			chromedp.Nodes(selector, &nodes),
+			chromedp.ActionFunc(func(ctx context.Context) error {
+				for _, node := range nodes {
+					if node.NodeType == cdp.NodeTypeElement {
+						urls = append(urls, node.Attributes[1])
+					}
+				}
+				return nil
+			}),
+		)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
-
-	_, err = file.Write(bytes)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer file.Close()
+	return urls
 
 }
 
-func ScrappUrls(selector, url string, nodes []*cdp.Node, string *[]string) {
-	panic("unimplemented")
-}
-
-func ScrapPageNumMoniteur() int {
+func (m *ScrapperPharma) ScrapPageNumMoniteur() int {
 
 	URL := "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
 	ctx, _ := chromedp.NewContext(context.Background())
@@ -157,7 +129,7 @@ func ProcessPaginator(nodes []*cdp.Node) int {
 	return len(nodes) - 4
 }
 
-func extractDepartement(str string) int {
+func (m *ScrapperPharma) ExtractDepartement(str string) int {
 
 	split := strings.Split(str, "(")
 	if len(split) > 1 {
@@ -172,4 +144,15 @@ func extractDepartement(str string) int {
 	}
 
 	return 0
+}
+
+func (m *ScrapperPharma) WrapperScrappUrl() {
+	urls := m.ScrappUrls()
+	fmt.Println(urls)
+
+}
+func (m *ScrapperPharma) WrapperScrappAnnonces() {
+	annonces := m.ScrappAnnonces(m.Selectors)
+	utils.arrToJson(annonces, "moniteur.json")
+
 }

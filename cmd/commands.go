@@ -3,17 +3,15 @@ package main
 import (
 	"fmt"
 
-	"github.com/Stupnikjs/goscrapp/data"
 	"github.com/Stupnikjs/goscrapp/scrap"
 )
 
+var moniteurScrap = scrap.Moniteur
+
 var commandsMap = map[string]func(){
 	"exit":   Exit,
-	"anmoni": scrap.CreateMoniteurAnnoncesFile,
-	"anocp":  scrap.CreateOcpAnnoncesFile,
-	"murl":   scrap.GetMoniteurUrls,
-	"ourl":   scrap.GetOcpUrls,
-	"melt":   data.MeltJsonAnnonces,
+	"murl":   moniteurScrap.WrapperScrappUrl,
+	"anmoni": moniteurScrap.WrapperScrappAnnonces,
 }
 
 func CommandParser(cmd string) {
