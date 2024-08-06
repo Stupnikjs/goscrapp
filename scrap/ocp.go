@@ -22,7 +22,7 @@ var OcpSelectors = Selectors{
 	ContratSelector: `//li[@class='job_contract_type']/strong`,
 }
 
-func NewOcpAnnonce(url string) *data.Annonce {
+func (m *ScrapperPharma) (url string) data.Annonce {
 
 	var date, jobtype, employementType, location, description string
 
@@ -35,9 +35,9 @@ func NewOcpAnnonce(url string) *data.Annonce {
 	err := chromedp.Run(
 		ctx,
 		chromedp.Navigate(url),
-		chromedp.Text(jobtypeSelector, &jobtype, chromedp.NodeVisible),
-		chromedp.Text(employementTypeSelector, &employementType, chromedp.NodeVisible),
-		chromedp.Text(locationSelector, &location, chromedp.NodeVisible),
+		chromedp.Text(OcpSelectors.EmploiSelector, &jobtype, chromedp.NodeVisible),
+		chromedp.Text(OcpSelectors.EmploiSelector, &employementType, chromedp.NodeVisible),
+		chromedp.Text(OcpSelectors.LieuSelector, &location, chromedp.NodeVisible),
 		chromedp.Text(descriptionSelector, &description, chromedp.NodeVisible),
 	)
 

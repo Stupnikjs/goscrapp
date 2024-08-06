@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
@@ -27,40 +28,66 @@ var MoniteurSelectors = Selectors{
 
 func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
 	annonces := []data.Annonce{}
-	for _, url := range m.Urls[:5] {
-		var entreprise, date, jobtype, employementType, location string
+	var wg sync.WaitGroup
+	annoncesChan := make(chan data.Annonce, len(m.Urls[15:20]))
 
-		ctx, _ := chromedp.NewContext(context.Background())
-		ctx, cancel := context.WithTimeout(ctx, time.Second*10)
-		defer cancel()
+	for _, url := range m.Urls[15:20] {
+		wg.Add(1)
+		go func(url string) {
+			defer wg.Done()
+			a := m.GetAnnonce(url, sels)
+			if a.Url != "" { // Only send if scraping was successful
+				annoncesChan <- a
+			}
+		}(url)
+	}
+	// Close the channel once all goroutines are done
+	go func() {
+		wg.Wait()
+		close(annoncesChan)
+	}()
 
-		err := chromedp.Run(
-			ctx,
-			chromedp.Navigate(url),
-			chromedp.Text(sels.EntepriseSelector, &entreprise, chromedp.NodeVisible),
-			chromedp.Text(sels.DateSelector, &date, chromedp.NodeVisible),
-			chromedp.Text(sels.EmploiSelector, &jobtype, chromedp.NodeVisible),
-			chromedp.Text(sels.ContratSelector, &employementType, chromedp.NodeVisible),
-			chromedp.Text(sels.LieuSelector, &location, chromedp.NodeVisible),
-		)
-
-		if err != nil {
-			fmt.Println(err)
-		}
-
-		a := data.Annonce{
-			Url:         url,
-			PubDate:     date,
-			Lieu:        location,
-			Profession:  jobtype,
-			Departement: m.ExtractDepartement(location),
-			Contrat:     employementType,
-			Created_at:  time.Now().Format("2022-02-06"),
-		}
+	// Collect results from the channel
+	for a := range annoncesChan {
 		annonces = append(annonces, a)
 	}
+
 	return annonces
 
+}
+
+func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
+	var entreprise, date, jobtype, employementType, location string
+	fmt.Println(url)
+	ctx, _ := chromedp.NewContext(context.Background())
+	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
+	defer cancel()
+
+	err := chromedp.Run(
+		ctx,
+		chromedp.Navigate(url),
+		chromedp.Text(sels.EntepriseSelector, &entreprise, chromedp.NodeVisible),
+		chromedp.Text(sels.DateSelector, &date, chromedp.NodeVisible),
+		chromedp.Text(sels.EmploiSelector, &jobtype, chromedp.NodeVisible),
+		chromedp.Text(sels.ContratSelector, &employementType, chromedp.NodeVisible),
+		chromedp.Text(sels.LieuSelector, &location, chromedp.NodeVisible),
+	)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	dateStr := strings.Split(time.Now().String(), " ")
+	a := data.Annonce{
+		Url:         url,
+		PubDate:     date,
+		Lieu:        location,
+		Profession:  jobtype,
+		Departement: m.ExtractDepartement(location),
+		Contrat:     employementType,
+		Created_at:  dateStr[0],
+	}
+	return a
 }
 
 func (m *ScrapperPharma) ScrappUrls() {
