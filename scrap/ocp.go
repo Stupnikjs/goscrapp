@@ -38,7 +38,7 @@ func ScrapOcpUrls() {
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			for _, node := range nodes {
 				if node.NodeType == cdp.NodeTypeElement {
-					*urls = append(*urls, node.Attributes[1])
+					urls = append(urls, node.Attributes[1])
 				}
 			}
 			return nil
