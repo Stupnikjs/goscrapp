@@ -24,6 +24,7 @@ var OcpSelectors = Selectors{
 
 func ScrapOcpUrls() {
 	var nodes []*cdp.Node
+	var urls []string
 	var selector string = `//div[contains(@class, 'offer') and contains(@class, 'theme_2')]//a/@href`
 	var URL string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
 	ctx, _ := chromedp.NewContext(context.Background())
