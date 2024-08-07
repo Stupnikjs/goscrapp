@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
@@ -16,9 +15,8 @@ import (
 
 // creer un checkeur de doublons
 
-var Moniteur = ScrapperPharma{}
-
 var MoniteurSelectors = Selectors{
+	Site:              "moniteur",
 	EntepriseSelector: `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`,
 	DateSelector:      `//span[@itemprop='datePosted']`,
 	EmploiSelector:    `//span[@itemprop='occupationalCategory']`,
@@ -26,81 +24,36 @@ var MoniteurSelectors = Selectors{
 	LieuSelector:      `//span[@itemprop='jobLocation']//span`,
 }
 
+var Moniteur = ScrapperPharma{
+	Selectors: MoniteurSelectors,
+}
+
 func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
 	annonces := []data.Annonce{}
-	var wg sync.WaitGroup
-	annoncesChan := make(chan data.Annonce, len(m.Urls[:100]))
 
-	for _, url := range m.Urls[:100] {
-		wg.Add(1)
-		go func(url string) {
-			defer wg.Done()
-			a := m.GetAnnonce(url, sels)
-			if a.Url != "" { // Only send if scraping was successful
-				annoncesChan <- a
-			}
-		}(url)
-	}
-	// Close the channel once all goroutines are done
-	go func() {
-		wg.Wait()
-		close(annoncesChan)
-	}()
+	for _, url := range m.Urls {
 
-	// Collect results from the channel
-	for a := range annoncesChan {
-		annonces = append(annonces, a)
+		a := m.GetAnnonce(url, sels)
+		if a.Url != "" {
+			annonces = append(annonces, a)
+		}
 	}
 
 	return annonces
 
 }
 
-func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
-	var entreprise, date, jobtype, employementType, location string
-	fmt.Println(url)
-	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
-	defer cancel()
-
-	err := chromedp.Run(
-		ctx,
-		chromedp.Navigate(url),
-		chromedp.Text(sels.EntepriseSelector, &entreprise, chromedp.NodeVisible),
-		chromedp.Text(sels.DateSelector, &date, chromedp.NodeVisible),
-		chromedp.Text(sels.EmploiSelector, &jobtype, chromedp.NodeVisible),
-		chromedp.Text(sels.ContratSelector, &employementType, chromedp.NodeVisible),
-		chromedp.Text(sels.LieuSelector, &location, chromedp.NodeVisible),
-	)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	dateStr := strings.Split(time.Now().String(), " ")
-	a := data.Annonce{
-		Url:         url,
-		PubDate:     date,
-		Lieu:        location,
-		Profession:  jobtype,
-		Departement: m.ExtractDepartement(location),
-		Contrat:     employementType,
-		Created_at:  dateStr[0],
-	}
-	return a
-}
-
-func (m *ScrapperPharma) ScrappUrls() {
+func (m *ScrapperPharma) ScrappMoniteurUrls() {
 	var selector string = `//ul[@class="tablelike"]//a/@href`
 	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
-	pageNum := m.ScrapPageNumMoniteur()
+	_ = m.ScrapPageNumMoniteur()
 
-	for i := range make([]int, pageNum, 16) {
+	for i := range make([]int, 10, 16) {
 
 		if i != 0 {
 			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
 		}
-
+		fmt.Println(url)
 		var nodes []*cdp.Node
 		ctx, _ := chromedp.NewContext(context.Background())
 		ctx, cancel := context.WithTimeout(ctx, time.Second*20)
@@ -173,12 +126,12 @@ func (m *ScrapperPharma) ExtractDepartement(str string) int {
 }
 
 func (m *ScrapperPharma) WrapperScrappUrl() {
-	m.ScrappUrls()
+	m.ScrappMoniteurUrls()
 	fmt.Println(m.Urls)
 }
 func (m *ScrapperPharma) WrapperScrappAnnonces() {
 	if len(m.Urls) == 0 {
-		m.ScrappUrls()
+		m.ScrappMoniteurUrls()
 		utils.ArrToJson(m.Urls, "moniteur_urls.json")
 		fmt.Println(m.Urls)
 	}

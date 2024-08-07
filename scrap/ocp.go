@@ -15,25 +15,23 @@ import (
 var Ocp ScrapperPharma
 
 var OcpSelectors = Selectors{
+	Site:            "ocp",
 	LieuSelector:    `//article//h3`,
 	EmploiSelector:  `//article//h2`,
 	ContratSelector: `//li[@class='job_contract_type']/strong`,
 }
 
-
-
-func ScrapOcpUrls() {
+func (m *ScrapperPharma) ScrapOcpUrls(url string) {
 	var nodes []*cdp.Node
 	var urls []string
 	var selector string = `//div[contains(@class, 'offer') and contains(@class, 'theme_2')]//a/@href`
-	var URL string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*20)
 	defer cancel()
 
 	err := chromedp.Run(
 		ctx,
-		chromedp.Navigate(URL),
+		chromedp.Navigate(url),
 		chromedp.Nodes(selector, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			for _, node := range nodes {
@@ -49,9 +47,8 @@ func ScrapOcpUrls() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(urls)
+	m.Urls = append(m.Urls, urls...)
 }
-
 
 func (m *ScrapperPharma) GetOcpUrls() {
 	var url string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
@@ -63,11 +60,10 @@ func (m *ScrapperPharma) GetOcpUrls() {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.petitesannonces-ocp.fr/annonces/offres-emploi?page=%d", i+1)
 		}
-		ScrapOcpUrls()
+		m.ScrapOcpUrls(url)
 	}
 
-	m.Urls = urls 
-	fmt.Println(urls)
+	m.Urls = append(m.Urls, urls...)
 
 }
 
@@ -107,7 +103,7 @@ func GetOcpPaginatorNum(url string) int {
 	return pageInt
 }
 
-func parseDep(str string) int {
+func (m *ScrapperPharma) ParseDep(str string) int {
 	split := strings.Split(str, ",")
 
 	if len(split) < 1 {
@@ -123,6 +119,3 @@ func parseDep(str string) int {
 	}
 	return 0
 }
-
-
-

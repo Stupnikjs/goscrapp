@@ -1,10 +1,17 @@
 package scrap
 
 import (
+	"context"
+	"fmt"
+	"strings"
+	"time"
+
 	"github.com/Stupnikjs/goscrapp/data"
+	"github.com/chromedp/chromedp"
 )
 
 type Selectors struct {
+	Site              string
 	EntepriseSelector string
 	DateSelector      string
 	LieuSelector      string
@@ -19,8 +26,43 @@ type ScrapperPharma struct {
 	Urls      []string
 }
 
-type Scrapper interface {
-	ScrappAnnonce(Selectors) []data.Annonce
-	ScrappUrls(string)
-	ParseDep(string) int
+func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
+	var entreprise, date, jobtype, employementType, location string
+	fmt.Println(url)
+	ctx, _ := chromedp.NewContext(context.Background())
+	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
+	defer cancel()
+
+	err := chromedp.Run(
+		ctx,
+		chromedp.Navigate(url),
+		chromedp.Text(sels.EntepriseSelector, &entreprise, chromedp.NodeVisible),
+		chromedp.Text(sels.DateSelector, &date, chromedp.NodeVisible),
+		chromedp.Text(sels.EmploiSelector, &jobtype, chromedp.NodeVisible),
+		chromedp.Text(sels.ContratSelector, &employementType, chromedp.NodeVisible),
+		chromedp.Text(sels.LieuSelector, &location, chromedp.NodeVisible),
+	)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	dateStr := strings.Split(time.Now().String(), " ")
+	a := data.Annonce{
+		Url:        url,
+		PubDate:    date,
+		Lieu:       location,
+		Profession: jobtype,
+		Contrat:    employementType,
+		Created_at: dateStr[0],
+	}
+
+	if m.Selectors.Site == "moniteur" {
+		a.Departement = m.ExtractDepartement(location)
+	}
+	if m.Selectors.Site == "ocp" {
+		a.Departement = m.ParseDep(location)
+	}
+
+	return a
 }
