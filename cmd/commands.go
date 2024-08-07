@@ -13,7 +13,7 @@ var commandsMap = map[string]func(){
 	"exit":   Exit,
 	"murl":   moniteurScrap.WrapperScrappUrl,
 	"anmoni": moniteurScrap.WrapperScrappAnnonces,
-	"ocpurl": ocp.GetOcpUrl
+	"ocpurl": ocp.GetOcpUrl,
 }
 
 func CommandParser(cmd string) {
