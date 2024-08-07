@@ -53,7 +53,6 @@ func ScrapOcpUrls() {
 
 
 func (m *ScrapperPharma) GetOcpUrls() {
-	var nodes []*cdp.Node
 	var url string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
 	var urls = []string{}
 
