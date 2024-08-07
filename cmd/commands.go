@@ -7,11 +7,13 @@ import (
 )
 
 var moniteurScrap = scrap.Moniteur
+var ocp = scrap.Ocp 
 
 var commandsMap = map[string]func(){
 	"exit":   Exit,
 	"murl":   moniteurScrap.WrapperScrappUrl,
 	"anmoni": moniteurScrap.WrapperScrappAnnonces,
+	"ocpurl": ocp.GetOcpUrl
 }
 
 func CommandParser(cmd string) {
