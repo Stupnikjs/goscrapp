@@ -25,7 +25,7 @@ var OcpSelectors = Selectors{
 
 
 func ScrapOcpUrls() {
-	var nodes []*cdp.Node{}
+	var nodes []*cdp.Node
 	var selector string = `//div[contains(@class, 'offer') and contains(@class, 'theme_2')]//a/@href`
 
 	ctx, _ := chromedp.NewContext(context.Background())
