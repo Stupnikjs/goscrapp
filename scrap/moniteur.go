@@ -29,9 +29,9 @@ var MoniteurSelectors = Selectors{
 func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
 	annonces := []data.Annonce{}
 	var wg sync.WaitGroup
-	annoncesChan := make(chan data.Annonce, len(m.Urls[15:20]))
+	annoncesChan := make(chan data.Annonce, len(m.Urls[:10]))
 
-	for _, url := range m.Urls[15:20] {
+	for _, url := range m.Urls[:10] {
 		wg.Add(1)
 		go func(url string) {
 			defer wg.Done()
