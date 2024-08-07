@@ -12,13 +12,15 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-var Ocp ScrapperPharma
-
 var OcpSelectors = Selectors{
 	Site:            "ocp",
 	LieuSelector:    `//article//h3`,
 	EmploiSelector:  `//article//h2`,
 	ContratSelector: `//li[@class='job_contract_type']/strong`,
+}
+
+var Ocp = ScrapperPharma{
+	Selectors: OcpSelectors,
 }
 
 func (m *ScrapperPharma) ScrapOcpUrls(url string) {
