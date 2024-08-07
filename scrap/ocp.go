@@ -2,9 +2,7 @@ package scrap
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -69,7 +67,7 @@ func (m *ScrapperPharma) GetOcpUrls() {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.petitesannonces-ocp.fr/annonces/offres-emploi?page=%d", i+1)
 		}
-		ScrapOcpUrls(selector, url, nodes, &urls)
+		ScrapOcpUrls()
 	}
 
 	m.Urls = urls 
