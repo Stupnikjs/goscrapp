@@ -49,6 +49,7 @@ func ScrapOcpUrls() {
 		fmt.Println(err)
 	}
 
+	fmt.Println(urls)
 }
 
 
