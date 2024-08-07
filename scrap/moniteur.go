@@ -177,6 +177,7 @@ func (m *ScrapperPharma) WrapperScrappUrl() {
 	fmt.Println(m.Urls)
 }
 func (m *ScrapperPharma) WrapperScrappAnnonces() {
+	fmt.Println("here")
 	if len(m.Urls) == 0 {
 		m.ScrappUrls()
 		utils.ArrToJson(m.Urls, "moniteur_urls.json")
