@@ -50,11 +50,6 @@ func ScrapOcpUrls() {
 
 }
 
-func ProcessOcpNodes(nodes []*cdp.Node, urls *[]string) {
-
-	
-
-}
 
 func (m *ScrapperPharma) GetOcpUrls() {
 	var nodes []*cdp.Node
