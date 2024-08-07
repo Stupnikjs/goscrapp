@@ -22,42 +22,12 @@ var OcpSelectors = Selectors{
 	ContratSelector: `//li[@class='job_contract_type']/strong`,
 }
 
-func (m *Scrapper) GetAnnonce(url string) data.Annonce {
 
-	var date, jobtype, employementType, location, description string
 
-	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Second*8)
-	defer cancel()
+func ScrapOcpUrls() {
+	var nodes []*cdp.Node{}
+	var selector string = `//div[contains(@class, 'offer') and contains(@class, 'theme_2')]//a/@href`
 
-	descriptionSelector := `//p[@id="description"]`
-
-	err := chromedp.Run(
-		ctx,
-		chromedp.Navigate(url),
-		chromedp.Text(OcpSelectors.EmploiSelector, &jobtype, chromedp.NodeVisible),
-		chromedp.Text(OcpSelectors.EmploiSelector, &employementType, chromedp.NodeVisible),
-		chromedp.Text(OcpSelectors.LieuSelector, &location, chromedp.NodeVisible),
-		chromedp.Text(descriptionSelector, &description, chromedp.NodeVisible),
-	)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return &data.Annonce{
-		Url:         url,
-		PubDate:     date,
-		Lieu:        location,
-		Departement: parseDep(location),
-		Profession:  jobtype,
-		Contrat:     employementType,
-		Created_at:  time.Now().Format("2022-02-06"),
-	}
-
-}
-
-func ScrapOcpUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string) {
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*20)
 	defer cancel()
@@ -67,7 +37,11 @@ func ScrapOcpUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string
 		chromedp.Navigate(URL),
 		chromedp.Nodes(selector, &nodes),
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			ProcessOcpNodes(nodes, urls)
+			for _, node := range nodes {
+				if node.NodeType == cdp.NodeTypeElement {
+					*urls = append(*urls, node.Attributes[1])
+				}
+			}
 			return nil
 		}),
 	)
@@ -80,17 +54,12 @@ func ScrapOcpUrls(selector string, URL string, nodes []*cdp.Node, urls *[]string
 
 func ProcessOcpNodes(nodes []*cdp.Node, urls *[]string) {
 
-	for _, node := range nodes {
-		if node.NodeType == cdp.NodeTypeElement {
-			*urls = append(*urls, node.Attributes[1])
-		}
-	}
+	
 
 }
 
-func GetOcpUrls() {
+func (m *ScrapperPharma) GetOcpUrls() {
 	var nodes []*cdp.Node
-	var selector string = `//div[contains(@class, 'offer') and contains(@class, 'theme_2')]//a/@href`
 	var url string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
 	var urls = []string{}
 
@@ -103,22 +72,7 @@ func GetOcpUrls() {
 		ScrapOcpUrls(selector, url, nodes, &urls)
 	}
 
-	bytes, err := json.Marshal(urls)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	file, err := os.Create("ocpurls.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	_, err = file.Write(bytes)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	defer file.Close()
+	m.Urls = urls 
 
 }
 
@@ -174,3 +128,6 @@ func parseDep(str string) int {
 	}
 	return 0
 }
+
+
+
