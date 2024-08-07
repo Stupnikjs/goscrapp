@@ -66,6 +66,7 @@ func (m *ScrapperPharma) GetOcpUrls() {
 	}
 
 	m.Urls = urls 
+	fmt.Println(urls)
 
 }
 
