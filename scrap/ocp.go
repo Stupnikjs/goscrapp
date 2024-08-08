@@ -115,7 +115,6 @@ func (m *ScrapperPharma) ParseDep(str string) int {
 
 	for dep := range data.Departements {
 		if strings.Contains(dep, strings.TrimSpace(split[1])) && len(dep) == len(strings.TrimSpace(split[1])) {
-			fmt.Println(split[1], dep, data.Departements[dep])
 			return data.Departements[dep]
 
 		}
@@ -128,14 +127,16 @@ func (m *ScrapperPharma) WrapperScrappOcpUrl() {
 }
 
 func (m *ScrapperPharma) WrapperScrappOcpAnnonces() {
+
 	if m.Selectors.Site != "ocp" {
 		fmt.Println("wrong site")
 		return
 	}
 	if len(m.Urls) == 0 {
+		fmt.Println("getting urls ....")
 		m.GetOcpUrls()
+		fmt.Println("array to json ....")
 		utils.ArrToJson(m.Urls, "ocp_urls.json")
-		fmt.Println(m.Urls)
 	}
 	annonces := m.ScrappAnnonces(m.Selectors)
 
