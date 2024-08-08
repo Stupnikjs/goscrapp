@@ -92,7 +92,7 @@ func ProcessPaginator(nodes []*cdp.Node) int {
 	return len(nodes) - 4
 }
 
-func (m *ScrapperPharma) ExtractDepartement(str string) int {
+func ExtractDepartement(str string) int {
 
 	split := strings.Split(str, "(")
 	if len(split) > 1 {

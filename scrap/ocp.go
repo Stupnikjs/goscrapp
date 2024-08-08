@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
-	"github.com/Stupnikjs/goscrapp/utils"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
@@ -20,13 +19,13 @@ var OcpSelectors = Selectors{
 	ContratSelector: `//li[@class='job_contract_type']/strong`,
 }
 
-var OcpScrapper = ScrapperSite{}
-
-func (m *ScrapperPharma) AppendSelectors(sel Selectors) {
-	m.Selectors = append(m.Selectors, sel)
+var OcpScrapper = ScrapperSite{
+	Site:        "ocp",
+	Selectors:   OcpSelectors,
+	UrlScrapper: GetOcpUrls,
 }
 
-func (m *ScrapperPharma) ScrapOcpUrls(url string) {
+func ScrapOcpUrls(url string) []string {
 	var nodes []*cdp.Node
 	var urls []string
 	var selector string = `//div[contains(@class, 'offer') and contains(@class, 'theme_2')]//a/@href`
@@ -52,12 +51,15 @@ func (m *ScrapperPharma) ScrapOcpUrls(url string) {
 		fmt.Println(err)
 	}
 
-	m.Urls = append(m.Urls, urls...)
+	return urls
 }
 
-func (m *ScrapperPharma) GetOcpUrls() {
+func GetOcpUrls(s *ScrapperSite) *ScrapperSite {
+	if s.Site != "ocp" {
+		fmt.Println("wrong site called")
+		return s
+	}
 	var url string = "https://www.petitesannonces-ocp.fr/annonces/offres-emploi"
-	var urls = []string{}
 
 	num := GetOcpPaginatorNum(url)
 
@@ -65,11 +67,9 @@ func (m *ScrapperPharma) GetOcpUrls() {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.petitesannonces-ocp.fr/annonces/offres-emploi?page=%d", i+1)
 		}
-		m.ScrapOcpUrls(url)
+		s.Urls = append(s.Urls, ScrapOcpUrls(url)...)
 	}
-
-	m.Urls = append(m.Urls, urls...)
-
+	return s
 }
 
 func GetOcpPaginatorNum(url string) int {
@@ -108,7 +108,10 @@ func GetOcpPaginatorNum(url string) int {
 	return pageInt
 }
 
-func (m *ScrapperPharma) ParseDep(str string) int {
+func (s *ScrapperSite) ParseDep(str string) int {
+	if s.Site == "moniteur" {
+		return ExtractDepartement(str)
+	}
 	split := strings.Split(str, ",")
 
 	if len(split) < 2 {
@@ -122,28 +125,4 @@ func (m *ScrapperPharma) ParseDep(str string) int {
 		}
 	}
 	return 0
-}
-
-func (m *ScrapperPharma) WrapperScrappOcpUrl() {
-	m.GetOcpUrls()
-}
-
-func (m *ScrapperPharma) WrapperScrappOcpAnnonces() {
-
-	if m.Selectors.Site != "ocp" {
-		fmt.Println("wrong site")
-		return
-	}
-	if len(m.Urls) == 0 {
-		fmt.Println("getting urls ....")
-		m.GetOcpUrls()
-		fmt.Println("array to json ....")
-		utils.ArrToJson(m.Urls, "ocp_urls.json")
-	}
-	fmt.Println("scrapping annonces ....")
-	annonces := m.ScrappAnnonces()
-
-	err := utils.ArrToJson(annonces, "ocp.json")
-	fmt.Println(err)
-
 }

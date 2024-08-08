@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/Stupnikjs/goscrapp/scrap"
 )
 
 var commandsMap = map[string]func(){
 	"exit": Exit,
+	"url":  scrap.Scr.Wrapper,
 }
 
 func CommandParser(cmd string) {

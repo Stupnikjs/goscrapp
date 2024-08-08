@@ -24,22 +24,21 @@ type ScrapperSite struct {
 	Selectors   Selectors
 	UrlScrapper func(*ScrapperSite) *ScrapperSite
 	Urls        []string
+	Annonces    []data.Annonce
 }
 
-type ScrapperPharma struct {
+type Scrapper struct {
 	Scrappers []ScrapperSite
-	Annonces  []data.Annonce
 }
 
-var Scrapper = ScrapperPharma{
-	[]ScrapperSite{
+var Scr = Scrapper{
+	Scrappers: []ScrapperSite{
 		MoniteurScrapper,
 		OcpScrapper,
 	},
-	[]data.Annonce{},
 }
 
-func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
+func (s *ScrapperSite) GetAnnonce(url string) {
 	var entreprise, date, jobtype, employementType, location string
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
@@ -48,11 +47,11 @@ func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
 	err := chromedp.Run(
 		ctx,
 		chromedp.Navigate(url),
-		chromedp.Text(sels.EntepriseSelector, &entreprise, chromedp.NodeVisible),
-		chromedp.Text(sels.DateSelector, &date, chromedp.NodeVisible),
-		chromedp.Text(sels.EmploiSelector, &jobtype, chromedp.NodeVisible),
-		chromedp.Text(sels.ContratSelector, &employementType, chromedp.NodeVisible),
-		chromedp.Text(sels.LieuSelector, &location, chromedp.NodeVisible),
+		chromedp.Text(s.Selectors.EntepriseSelector, &entreprise, chromedp.NodeVisible),
+		chromedp.Text(s.Selectors.DateSelector, &date, chromedp.NodeVisible),
+		chromedp.Text(s.Selectors.EmploiSelector, &jobtype, chromedp.NodeVisible),
+		chromedp.Text(s.Selectors.ContratSelector, &employementType, chromedp.NodeVisible),
+		chromedp.Text(s.Selectors.LieuSelector, &location, chromedp.NodeVisible),
 	)
 
 	if err != nil {
@@ -61,42 +60,18 @@ func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
 
 	dateStr := strings.Split(time.Now().String(), " ")
 	a := data.Annonce{
-		Url:        url,
-		Id:         m.ParseWebID(url),
-		PubDate:    date,
-		Ville:      m.ParseVille(location),
-		Lieu:       location,
-		Profession: jobtype,
-		Contrat:    employementType,
-		Created_at: dateStr[0],
+		Url:         url,
+		Id:          ParseWebID(url, s.Site),
+		PubDate:     date,
+		Ville:       ParseVille(location, s.Site),
+		Departement: s.ParseDep(location),
+		Lieu:        location,
+		Profession:  jobtype,
+		Contrat:     employementType,
+		Created_at:  dateStr[0],
 	}
 
-	if m.Selectors.Site == "moniteur" {
-		a.Departement = m.ExtractDepartement(location)
-	}
-	if m.Selectors.Site == "ocp" {
-		a.Departement = m.ParseDep(location)
-	}
-
-	return a
-}
-
-func (m *ScrapperPharma) ScrappAnnonces() []data.Annonce {
-	annonces := []data.Annonce{}
-	for _, url := range m.Urls {
-		a := m.GetAnnonce(url, m.Selectors)
-		if a.Url != "" {
-			annonces = append(annonces, a)
-		}
-	}
-	return annonces
-}
-
-func (m *ScrapperPharma) ResetUrls() {
-	m.Urls = []string{}
-}
-func (m *ScrapperPharma) ResetAnnonces() {
-	m.Annonces = []data.Annonce{}
+	s.Annonces = append(s.Annonces, a)
 }
 
 func ParseWebID(url string, site string) string {
@@ -119,7 +94,7 @@ func ParseWebID(url string, site string) string {
 
 }
 
-func (m *ScrapperPharma) ParseVille(loc string, site string) string {
+func ParseVille(loc string, site string) string {
 	switch site {
 	case "moniteur":
 		return ""
@@ -133,6 +108,12 @@ func (m *ScrapperPharma) ParseVille(loc string, site string) string {
 
 }
 
-// iterate througth selectors
-
-// scrap urls
+func (s *Scrapper) Wrapper() {
+	for _, scrap := range s.Scrappers {
+		scrap.UrlScrapper(&scrap)
+		for _, url := range scrap.Urls[:5] {
+			scrap.GetAnnonce(url)
+		}
+		fmt.Println(scrap.Annonces)
+	}
+}
