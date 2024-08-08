@@ -109,7 +109,7 @@ func GetOcpPaginatorNum(url string) int {
 func (m *ScrapperPharma) ParseDep(str string) int {
 	split := strings.Split(str, ",")
 
-	if len(split) < 1 {
+	if len(split) < 2 {
 		return 0
 	}
 

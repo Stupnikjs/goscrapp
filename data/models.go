@@ -30,3 +30,7 @@ func GetAllAnnnonces() []Annonce {
 	return annonces
 
 }
+
+func GetAnnoncesHash() {
+
+}
