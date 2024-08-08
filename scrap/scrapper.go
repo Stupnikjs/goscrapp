@@ -120,3 +120,5 @@ func (s *Scrapper) Wrapper() {
 	end := time.Now()
 	fmt.Println(end.Sub(start))
 }
+
+// s *Scrapper Json()
