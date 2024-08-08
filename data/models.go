@@ -8,7 +8,6 @@ import (
 
 type Annonce struct {
 	Id          string `json:"id"`
-	Digest      string `json:"digest"`
 	Url         string `json:"url"`
 	PubDate     string `json:"pubdate"`
 	Ville       string `json:"ville"`
@@ -28,9 +27,5 @@ func GetAllAnnnonces() []Annonce {
 	bytes, _ := io.ReadAll(file)
 	_ = json.Unmarshal(bytes, &annonces)
 	return annonces
-
-}
-
-func GetAnnoncesHash() {
 
 }

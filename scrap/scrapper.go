@@ -49,7 +49,9 @@ func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
 	dateStr := strings.Split(time.Now().String(), " ")
 	a := data.Annonce{
 		Url:        url,
+		Id:         m.ParseWebID(url),
 		PubDate:    date,
+		Ville:      m.ParseVille(location),
 		Lieu:       location,
 		Profession: jobtype,
 		Contrat:    employementType,
@@ -82,4 +84,38 @@ func (m *ScrapperPharma) ResetUrls() {
 }
 func (m *ScrapperPharma) ResetAnnonces() {
 	m.Annonces = []data.Annonce{}
+}
+
+func (m *ScrapperPharma) ParseWebID(url string) string {
+	switch m.Selectors.Site {
+	case "moniteur":
+		firstSplit := strings.Split(url, "-")
+		if len(firstSplit) < 2 {
+			return ""
+		}
+		secSplit := strings.Split(firstSplit[len(firstSplit)-1], ".")
+		return secSplit[0]
+	case "ocp":
+		split := strings.Split(url, "/")
+		return split[len(split)-2]
+
+	default:
+		fmt.Println("error wrong site property")
+		return ""
+	}
+
+}
+
+func (m *ScrapperPharma) ParseVille(loc string) string {
+	switch m.Selectors.Site {
+	case "moniteur":
+		return ""
+	case "ocp":
+		return ""
+
+	default:
+		fmt.Println("error wrong site property")
+		return ""
+	}
+
 }
