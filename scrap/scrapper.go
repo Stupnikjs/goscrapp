@@ -28,7 +28,6 @@ type ScrapperPharma struct {
 
 func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
 	var entreprise, date, jobtype, employementType, location string
-	fmt.Println(url)
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
@@ -65,4 +64,11 @@ func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
 	}
 
 	return a
+}
+
+func (m *ScrapperPharma) ResetUrls() {
+	m.Urls = []string{}
+}
+func (m *ScrapperPharma) ResetAnnonces() {
+	m.Annonces = []data.Annonce{}
 }

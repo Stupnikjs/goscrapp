@@ -10,11 +10,13 @@ var moniteurScrap = scrap.Moniteur
 var ocp = scrap.Ocp
 
 var commandsMap = map[string]func(){
-	"exit":   Exit,
-	"murl":   moniteurScrap.WrapperScrappUrl,
-	"anmoni": moniteurScrap.WrapperScrappAnnonces,
-	"ocpurl": ocp.GetOcpUrls,
-	"anocp":  ocp.WrapperScrappAnnonces,
+	"exit":    Exit,
+	"murl":    moniteurScrap.WrapperScrappUrl,
+	"anmoni":  moniteurScrap.WrapperScrappAnnonces,
+	"ocpurl":  ocp.GetOcpUrls,
+	"anocp":   ocp.WrapperScrappAnnonces,
+	"resocp":  ocp.ResetUrls,
+	"resmoni": moniteurScrap.ResetUrls,
 }
 
 func CommandParser(cmd string) {
