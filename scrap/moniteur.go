@@ -119,7 +119,7 @@ func (m *ScrapperPharma) WrapperScrappAnnonces() {
 		utils.ArrToJson(m.Urls, "moniteur_urls.json")
 		fmt.Println(m.Urls)
 	}
-	annonces := m.ScrappAnnonces(m.Selectors)
+	annonces := m.ScrappAnnonces()
 
 	err := utils.ArrToJson(annonces, "moniteur.json")
 	fmt.Println(err)
