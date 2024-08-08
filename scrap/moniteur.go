@@ -37,7 +37,6 @@ func (m *ScrapperPharma) ScrappMoniteurUrls() {
 		if i != 0 {
 			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
 		}
-		fmt.Println(url)
 		var nodes []*cdp.Node
 		ctx, _ := chromedp.NewContext(context.Background())
 		ctx, cancel := context.WithTimeout(ctx, time.Second*20)
