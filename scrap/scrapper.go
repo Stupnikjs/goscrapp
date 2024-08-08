@@ -11,7 +11,6 @@ import (
 )
 
 type Selectors struct {
-	Site              string
 	EntepriseSelector string
 	DateSelector      string
 	LieuSelector      string
@@ -20,10 +19,24 @@ type Selectors struct {
 	UrlSelector       string
 }
 
+type ScrapperSite struct {
+	Site        string
+	Selectors   Selectors
+	UrlScrapper func(*ScrapperSite) *ScrapperSite
+	Urls        []string
+}
+
 type ScrapperPharma struct {
-	Selectors Selectors
+	Scrappers []ScrapperSite
 	Annonces  []data.Annonce
-	Urls      []string
+}
+
+var Scrapper = ScrapperPharma{
+	[]ScrapperSite{
+		MoniteurScrapper,
+		OcpScrapper,
+	},
+	[]data.Annonce{},
 }
 
 func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
@@ -86,8 +99,8 @@ func (m *ScrapperPharma) ResetAnnonces() {
 	m.Annonces = []data.Annonce{}
 }
 
-func (m *ScrapperPharma) ParseWebID(url string) string {
-	switch m.Selectors.Site {
+func ParseWebID(url string, site string) string {
+	switch site {
 	case "moniteur":
 		firstSplit := strings.Split(url, "-")
 		if len(firstSplit) < 2 {
@@ -106,8 +119,8 @@ func (m *ScrapperPharma) ParseWebID(url string) string {
 
 }
 
-func (m *ScrapperPharma) ParseVille(loc string) string {
-	switch m.Selectors.Site {
+func (m *ScrapperPharma) ParseVille(loc string, site string) string {
+	switch site {
 	case "moniteur":
 		return ""
 	case "ocp":
@@ -119,3 +132,7 @@ func (m *ScrapperPharma) ParseVille(loc string) string {
 	}
 
 }
+
+// iterate througth selectors
+
+// scrap urls

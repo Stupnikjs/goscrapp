@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Stupnikjs/goscrapp/utils"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
@@ -15,7 +14,6 @@ import (
 // creer un checkeur de doublons
 
 var MoniteurSelectors = Selectors{
-	Site:              "moniteur",
 	EntepriseSelector: `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`,
 	DateSelector:      `//span[@itemprop='datePosted']`,
 	EmploiSelector:    `//span[@itemprop='occupationalCategory']`,
@@ -23,14 +21,16 @@ var MoniteurSelectors = Selectors{
 	LieuSelector:      `//span[@itemprop='jobLocation']//span`,
 }
 
-var Moniteur = ScrapperPharma{
-	Selectors: MoniteurSelectors,
+var MoniteurScrapper = ScrapperSite{
+	Site:        "moniteur",
+	Selectors:   MoniteurSelectors,
+	UrlScrapper: ScrappMoniteurUrls,
 }
 
-func (m *ScrapperPharma) ScrappMoniteurUrls() {
+func ScrappMoniteurUrls(s *ScrapperSite) *ScrapperSite {
 	var selector string = `//ul[@class="tablelike"]//a/@href`
 	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
-	pageNum := m.ScrapPageNumMoniteur()
+	pageNum := ScrapPageNumMoniteur()
 
 	for i := range make([]int, pageNum, 16) {
 
@@ -49,7 +49,7 @@ func (m *ScrapperPharma) ScrappMoniteurUrls() {
 			chromedp.ActionFunc(func(ctx context.Context) error {
 				for _, node := range nodes {
 					if node.NodeType == cdp.NodeTypeElement {
-						m.Urls = append(m.Urls, node.Attributes[1])
+						s.Urls = append(s.Urls, node.Attributes[1])
 					}
 				}
 				return nil
@@ -59,10 +59,11 @@ func (m *ScrapperPharma) ScrappMoniteurUrls() {
 			fmt.Println(err)
 		}
 	}
+	return s
 
 }
 
-func (m *ScrapperPharma) ScrapPageNumMoniteur() int {
+func ScrapPageNumMoniteur() int {
 
 	URL := "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
 	ctx, _ := chromedp.NewContext(context.Background())
@@ -108,10 +109,7 @@ func (m *ScrapperPharma) ExtractDepartement(str string) int {
 	return 0
 }
 
-func (m *ScrapperPharma) WrapperScrappUrl() {
-	m.ScrappMoniteurUrls()
-	fmt.Println(m.Urls)
-}
+/*
 func (m *ScrapperPharma) WrapperScrappAnnonces() {
 	if len(m.Urls) == 0 {
 		m.ScrappMoniteurUrls()
@@ -124,3 +122,4 @@ func (m *ScrapperPharma) WrapperScrappAnnonces() {
 	fmt.Println(err)
 
 }
+*/

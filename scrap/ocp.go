@@ -14,14 +14,16 @@ import (
 )
 
 var OcpSelectors = Selectors{
-	Site:            "ocp",
+
 	LieuSelector:    `//article//h3`,
 	EmploiSelector:  `//article//h2`,
 	ContratSelector: `//li[@class='job_contract_type']/strong`,
 }
 
-var Ocp = ScrapperPharma{
-	Selectors: OcpSelectors,
+var OcpScrapper = ScrapperSite{}
+
+func (m *ScrapperPharma) AppendSelectors(sel Selectors) {
+	m.Selectors = append(m.Selectors, sel)
 }
 
 func (m *ScrapperPharma) ScrapOcpUrls(url string) {
