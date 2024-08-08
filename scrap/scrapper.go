@@ -66,6 +66,17 @@ func (m *ScrapperPharma) GetAnnonce(url string, sels Selectors) data.Annonce {
 	return a
 }
 
+func (m *ScrapperPharma) ScrappAnnonces() []data.Annonce {
+	annonces := []data.Annonce{}
+	for _, url := range m.Urls {
+		a := m.GetAnnonce(url, m.Selectors)
+		if a.Url != "" {
+			annonces = append(annonces, a)
+		}
+	}
+	return annonces
+}
+
 func (m *ScrapperPharma) ResetUrls() {
 	m.Urls = []string{}
 }

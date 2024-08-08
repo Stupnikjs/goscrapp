@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Stupnikjs/goscrapp/data"
 	"github.com/Stupnikjs/goscrapp/utils"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
@@ -26,21 +25,6 @@ var MoniteurSelectors = Selectors{
 
 var Moniteur = ScrapperPharma{
 	Selectors: MoniteurSelectors,
-}
-
-func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
-	annonces := []data.Annonce{}
-
-	for _, url := range m.Urls {
-
-		a := m.GetAnnonce(url, sels)
-		if a.Url != "" {
-			annonces = append(annonces, a)
-		}
-	}
-
-	return annonces
-
 }
 
 func (m *ScrapperPharma) ScrappMoniteurUrls() {
