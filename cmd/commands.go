@@ -14,7 +14,7 @@ var commandsMap = map[string]func(){
 	"murl":    moniteurScrap.WrapperScrappUrl,
 	"anmoni":  moniteurScrap.WrapperScrappAnnonces,
 	"ocpurl":  ocp.GetOcpUrls,
-	"anocp":   ocp.WrapperScrappAnnonces,
+	"anocp":   ocp.WrapperScrappOcpAnnonces,
 	"resocp":  ocp.ResetUrls,
 	"resmoni": moniteurScrap.ResetUrls,
 }
