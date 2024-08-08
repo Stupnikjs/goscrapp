@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
+	"github.com/Stupnikjs/goscrapp/utils"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
@@ -120,4 +121,25 @@ func (m *ScrapperPharma) ParseDep(str string) int {
 		}
 	}
 	return 0
+}
+
+func (m *ScrapperPharma) WrapperScrappOcpUrl() {
+	m.GetOcpUrls()
+}
+
+func (m *ScrapperPharma) WrapperScrappOcpAnnonces() {
+	if m.Selectors.Site != "ocp" {
+		fmt.Println("wrong site")
+		return
+	}
+	if len(m.Urls) == 0 {
+		m.GetOcpUrls()
+		utils.ArrToJson(m.Urls, "ocp_urls.json")
+		fmt.Println(m.Urls)
+	}
+	annonces := m.ScrappAnnonces(m.Selectors)
+
+	err := utils.ArrToJson(annonces, "ocp.json")
+	fmt.Println(err)
+
 }

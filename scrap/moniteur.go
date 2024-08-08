@@ -46,9 +46,9 @@ func (m *ScrapperPharma) ScrappAnnonces(sels Selectors) []data.Annonce {
 func (m *ScrapperPharma) ScrappMoniteurUrls() {
 	var selector string = `//ul[@class="tablelike"]//a/@href`
 	var url string = "https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces.html"
-	_ = m.ScrapPageNumMoniteur()
+	pageNum := m.ScrapPageNumMoniteur()
 
-	for i := range make([]int, 10, 16) {
+	for i := range make([]int, pageNum, 16) {
 
 		if i != 0 {
 			url = fmt.Sprintf("https://www.lemoniteurdespharmacies.fr/emploi/espace-candidats/lire-les-annonces-%d.html", i)
