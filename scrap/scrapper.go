@@ -112,7 +112,7 @@ func (s *Scrapper) Wrapper() {
 	start := time.Now()
 	for _, scrap := range s.Scrappers {
 		scrap.UrlScrapper(&scrap)
-		for _, url := range scrap.Urls[:5] {
+		for _, url := range scrap.Urls {
 			scrap.GetAnnonce(url)
 		}
 		fmt.Println(scrap.Annonces)
