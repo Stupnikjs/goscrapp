@@ -7,8 +7,10 @@ import (
 )
 
 var commandsMap = map[string]func(){
-	"exit": Exit,
-	"url":  scrap.Scr.Wrapper,
+	"exit":  Exit,
+	"scrap": scrap.Scr.Wrapper,
+	"an":    scrap.Scr.PrintAnnnonces,
+	"json":  scrap.Scr.Json,
 }
 
 func CommandParser(cmd string) {

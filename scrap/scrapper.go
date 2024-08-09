@@ -2,7 +2,9 @@ package scrap
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -112,7 +114,7 @@ func (s *Scrapper) Wrapper() {
 	start := time.Now()
 	for _, scrap := range s.Scrappers {
 		scrap.UrlScrapper(&scrap)
-		for _, url := range scrap.Urls {
+		for _, url := range scrap.Urls[:100] {
 			scrap.GetAnnonce(url)
 		}
 		fmt.Println(scrap.Annonces)
@@ -121,4 +123,38 @@ func (s *Scrapper) Wrapper() {
 	fmt.Println(end.Sub(start))
 }
 
-// s *Scrapper Json()
+func (s *Scrapper) PrintAnnnonces() {
+	start := time.Now()
+	annonces := s.GetAllAnnonces()
+	fmt.Println(annonces)
+	end := time.Now()
+	fmt.Println(end.Sub(start))
+}
+
+func (s *Scrapper) GetAllAnnonces() []data.Annonce {
+	start := time.Now()
+	annonces := []data.Annonce{}
+	for _, scrap := range s.Scrappers {
+		for _, ann := range scrap.Annonces {
+			annonces = append(annonces, ann)
+		}
+	}
+	end := time.Now()
+	fmt.Println(end.Sub(start))
+	return annonces
+}
+
+func (s *Scrapper) Json() {
+	annonces := s.GetAllAnnonces()
+	bytes, err := json.Marshal(annonces)
+	if err != nil {
+		fmt.Println(err)
+	}
+	today := strings.Split(time.Now().String(), " ")[0]
+	file, err := os.Create(today)
+	if err != nil {
+		fmt.Println(err)
+	}
+	file.Write(bytes)
+	defer file.Close()
+}
