@@ -21,6 +21,13 @@ type Selectors struct {
 	UrlSelector       string
 }
 
+type SelectPair struct {
+Selector string,
+Value string,
+}
+
+type Selectors map[string]SelectPair{}
+
 type ScrapperSite struct {
 	Site        string
 	Selectors   Selectors
@@ -49,6 +56,8 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 	err := chromedp.Run(
 		ctx,
 		chromedp.Navigate(url),
+
+// Selector processor
 		chromedp.Text(s.Selectors.EntepriseSelector, &entreprise, chromedp.NodeVisible),
 		chromedp.Text(s.Selectors.DateSelector, &date, chromedp.NodeVisible),
 		chromedp.Text(s.Selectors.EmploiSelector, &jobtype, chromedp.NodeVisible),
@@ -74,6 +83,15 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 	}
 
 	s.Annonces = append(s.Annonces, a)
+}
+
+func (s *ScrapperSite) SelectorProcessor()[]chromedp.Actions{
+actions := []chromedp.Actions{}
+for k,v := range s.Selectors {
+   chromedp.Text(v.Selector, &v.Value, chromedp.NodeVisible)
+
+}
+return actions
 }
 
 func ParseWebID(url string, site string) string {
