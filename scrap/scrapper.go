@@ -94,6 +94,19 @@ for k,v := range s.Selectors {
 return actions
 }
 
+func (s *ScrapperSite) SelectorToAnnonce()data.Annonce{
+a := data.Annonce{}
+for k,v := range s.Selectors {
+   
+   switch k{
+       
+
+}
+
+}
+}
+
+
 func ParseWebID(url string, site string) string {
 	switch site {
 	case "moniteur":
