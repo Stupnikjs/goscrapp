@@ -12,10 +12,10 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-var OcpSelectors = map[string]SelectorPair{
-	"lieu":    {Selector: `//article//h3`},
-	"emploi":  {Selector: `//article//h2`},
-	"contrat": {Selector: `//li[@class='job_contract_type']/strong`},
+var OcpSelectors = []Selector{
+	{SelectorPath: `//article//h3`, Name: "lieu"},
+	{SelectorPath: `//article//h2`, Name: "emploi"},
+	{SelectorPath: `//li[@class='job_contract_type']/strong`, Name: "contrat"},
 }
 
 var OcpScrapper = ScrapperSite{

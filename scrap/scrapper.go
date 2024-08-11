@@ -12,12 +12,13 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-type SelectorPair struct {
-	Selector string
-	Value    string
+type Selector struct {
+	SelectorPath string
+	Name         string
+	Value        string
 }
 
-type Selectors map[string]SelectorPair
+type Selectors []Selector
 
 type ScrapperSite struct {
 	Site        string
@@ -51,7 +52,7 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	
+	fmt.Println(s.Selectors)
 	a := s.SelectorToAnnonce()
 	a.Url = url
 	s.Annonces = append(s.Annonces, a)
@@ -61,8 +62,8 @@ func (s *ScrapperSite) SelectorProcessor(url string) []chromedp.Action {
 	a := []chromedp.Action{
 		chromedp.Navigate(url),
 	}
-	for _, v := range s.Selectors {
-		b := chromedp.Text(v.Selector, &v.Value, chromedp.NodeVisible)
+	for i := range s.Selectors {
+		b := chromedp.Text(s.Selectors[i].SelectorPath, &s.Selectors[i].Value, chromedp.NodeVisible)
 		a = append(a, b)
 	}
 	return a
@@ -70,18 +71,16 @@ func (s *ScrapperSite) SelectorProcessor(url string) []chromedp.Action {
 
 func (s *ScrapperSite) SelectorToAnnonce() data.Annonce {
 	a := data.Annonce{}
-	for k, v := range s.Selectors {
-		switch k {
-
+	for _, sel := range s.Selectors {
+		switch sel.Name {
 		case "date":
-			a.PubDate = v.Value
+			a.PubDate = sel.Value
 		case "lieu":
-			a.Lieu = v.Value
+			a.Lieu = sel.Value
 		case "emploi":
-			a.Profession = v.Value
+			a.Profession = sel.Value
 		case "contrat":
-			a.Contrat = v.Value
-
+			a.Contrat = sel.Value
 		}
 
 	}
@@ -130,7 +129,7 @@ func (s *Scrapper) Wrapper() {
 		fmt.Println("urls scrapped")
 		for i, url := range scrap.Urls[:10] {
 			scrap.GetAnnonce(url)
-			fmt.Println(i + 1/10)
+			fmt.Println(i)
 		}
 		fmt.Println(scrap.Annonces)
 	}

@@ -13,12 +13,23 @@ import (
 
 // creer un checkeur de doublons
 
-var MoniteurSelectors = map[string]SelectorPair{
-	"entreprise": {Selector: `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`},
-	"date":       {Selector: `//span[@itemprop='datePosted']`},
-	"lieu":       {Selector: `//span[@itemprop='jobLocation']//span`},
-	"emploi":     {Selector: `//span[@itemprop='occupationalCategory']`},
-	"contrat":    {Selector: `//span[@itemprop='employmentType']`},
+var MoniteurSelectors = []Selector{
+	{
+		SelectorPath: `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`,
+		Name:         "entreprise",
+	},
+	{
+		SelectorPath: `//span[@itemprop='jobLocation']//span`,
+		Name:         "lieu",
+	},
+	{
+		SelectorPath: `//span[@itemprop='occupationalCategory']`,
+		Name:         "emploi",
+	},
+	{
+		SelectorPath: `//span[@itemprop='employmentType']`,
+		Name:         "contrat",
+	},
 }
 
 var MoniteurScrapper = ScrapperSite{
