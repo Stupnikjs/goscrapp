@@ -76,9 +76,9 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 	s.Annonces = append(s.Annonces, a)
 }
 
-func (s *ScrapperSite) SelectorProcessor() []chromedp.Actions {
-	actions := []chromedp.Actions{}
-	for k, v := range s.Selectors {
+func (s *ScrapperSite) SelectorProcessor() []chromedp.Action {
+	actions := []chromedp.Action{}
+	for _, v := range s.Selectors {
 		chromedp.Text(v.Selector, &v.Value, chromedp.NodeVisible)
 
 	}
@@ -91,9 +91,19 @@ func (s *ScrapperSite) SelectorToAnnonce() data.Annonce {
 
 		switch k {
 
+		case "date":
+			a.PubDate = v.Value
+		case "lieu":
+			a.Lieu = v.Value
+		case "emploi":
+			a.Profession = v.Value
+		case "contrat":
+			a.Contrat = v.Value
+
 		}
 
 	}
+	return a
 }
 
 func ParseWebID(url string, site string) string {

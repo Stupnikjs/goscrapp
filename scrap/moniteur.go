@@ -14,11 +14,11 @@ import (
 // creer un checkeur de doublons
 
 var MoniteurSelectors = Selectors{
-	EntepriseSelector: `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`,
-	DateSelector:      `//span[@itemprop='datePosted']`,
-	EmploiSelector:    `//span[@itemprop='occupationalCategory']`,
-	ContratSelector:   `//span[@itemprop='employmentType']`,
-	LieuSelector:      `//span[@itemprop='jobLocation']//span`,
+	EntrepriseSelector: `//*[@itemprop='hiringOrganization']//span[@itemprop="name"]`,
+	DateSelector:       `//span[@itemprop='datePosted']`,
+	EmploiSelector:     `//span[@itemprop='occupationalCategory']`,
+	ContratSelector:    `//span[@itemprop='employmentType']`,
+	LieuSelector:       `//span[@itemprop='jobLocation']//span`,
 }
 
 var MoniteurScrapper = ScrapperSite{
