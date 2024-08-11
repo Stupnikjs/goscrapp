@@ -12,21 +12,12 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
-type Selectors struct {
-	EntepriseSelector string
-	DateSelector      string
-	LieuSelector      string
-	EmploiSelector    string
-	ContratSelector   string
-	UrlSelector       string
+type SelectorPair struct {
+	Selector string
+	Value    string
 }
 
-type SelectPair struct {
-Selector string,
-Value string,
-}
-
-type Selectors map[string]SelectPair{}
+type Selectors map[string]SelectorPair
 
 type ScrapperSite struct {
 	Site        string
@@ -57,7 +48,7 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 		ctx,
 		chromedp.Navigate(url),
 
-// Selector processor
+		// Selector processor
 		chromedp.Text(s.Selectors.EntepriseSelector, &entreprise, chromedp.NodeVisible),
 		chromedp.Text(s.Selectors.DateSelector, &date, chromedp.NodeVisible),
 		chromedp.Text(s.Selectors.EmploiSelector, &jobtype, chromedp.NodeVisible),
@@ -85,27 +76,25 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 	s.Annonces = append(s.Annonces, a)
 }
 
-func (s *ScrapperSite) SelectorProcessor()[]chromedp.Actions{
-actions := []chromedp.Actions{}
-for k,v := range s.Selectors {
-   chromedp.Text(v.Selector, &v.Value, chromedp.NodeVisible)
+func (s *ScrapperSite) SelectorProcessor() []chromedp.Actions {
+	actions := []chromedp.Actions{}
+	for k, v := range s.Selectors {
+		chromedp.Text(v.Selector, &v.Value, chromedp.NodeVisible)
 
-}
-return actions
-}
-
-func (s *ScrapperSite) SelectorToAnnonce()data.Annonce{
-a := data.Annonce{}
-for k,v := range s.Selectors {
-   
-   switch k{
-       
-
+	}
+	return actions
 }
 
-}
-}
+func (s *ScrapperSite) SelectorToAnnonce() data.Annonce {
+	a := data.Annonce{}
+	for k, v := range s.Selectors {
 
+		switch k {
+
+		}
+
+	}
+}
 
 func ParseWebID(url string, site string) string {
 	switch site {
