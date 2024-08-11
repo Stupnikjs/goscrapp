@@ -127,7 +127,7 @@ func (s *Scrapper) Wrapper() {
 	for _, scrap := range s.Scrappers {
 		scrap.UrlScrapper(&scrap)
 		fmt.Println("urls scrapped")
-		for i, url := range scrap.Urls[:10] {
+		for i, url := range scrap.Urls[:100] {
 			scrap.GetAnnonce(url)
 			fmt.Println(i)
 		}
@@ -164,7 +164,7 @@ func (s *Scrapper) Json() {
 		fmt.Println(err)
 	}
 	today := strings.Split(time.Now().String(), " ")[0]
-	file, err := os.Create(today)
+	file, err := os.Create(today + ".json")
 	if err != nil {
 		fmt.Println(err)
 	}
