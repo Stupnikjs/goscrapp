@@ -39,56 +39,38 @@ var Scr = Scrapper{
 }
 
 func (s *ScrapperSite) GetAnnonce(url string) {
-	var entreprise, date, jobtype, employementType, location string
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
 
 	err := chromedp.Run(
 		ctx,
-		chromedp.Navigate(url),
-
-		// Selector processor
-		chromedp.Text(s.Selectors.EntepriseSelector, &entreprise, chromedp.NodeVisible),
-		chromedp.Text(s.Selectors.DateSelector, &date, chromedp.NodeVisible),
-		chromedp.Text(s.Selectors.EmploiSelector, &jobtype, chromedp.NodeVisible),
-		chromedp.Text(s.Selectors.ContratSelector, &employementType, chromedp.NodeVisible),
-		chromedp.Text(s.Selectors.LieuSelector, &location, chromedp.NodeVisible),
+		s.SelectorProcessor(url)...,
 	)
 
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	dateStr := strings.Split(time.Now().String(), " ")
-	a := data.Annonce{
-		Url:         url,
-		Id:          ParseWebID(url, s.Site),
-		PubDate:     date,
-		Ville:       ParseVille(location, s.Site),
-		Departement: s.ParseDep(location),
-		Lieu:        location,
-		Profession:  jobtype,
-		Contrat:     employementType,
-		Created_at:  dateStr[0],
-	}
-
+	
+	a := s.SelectorToAnnonce()
+	a.Url = url
 	s.Annonces = append(s.Annonces, a)
 }
 
-func (s *ScrapperSite) SelectorProcessor() []chromedp.Action {
-	actions := []chromedp.Action{}
-	for _, v := range s.Selectors {
-		chromedp.Text(v.Selector, &v.Value, chromedp.NodeVisible)
-
+func (s *ScrapperSite) SelectorProcessor(url string) []chromedp.Action {
+	a := []chromedp.Action{
+		chromedp.Navigate(url),
 	}
-	return actions
+	for _, v := range s.Selectors {
+		b := chromedp.Text(v.Selector, &v.Value, chromedp.NodeVisible)
+		a = append(a, b)
+	}
+	return a
 }
 
 func (s *ScrapperSite) SelectorToAnnonce() data.Annonce {
 	a := data.Annonce{}
 	for k, v := range s.Selectors {
-
 		switch k {
 
 		case "date":
@@ -169,9 +151,7 @@ func (s *Scrapper) GetAllAnnonces() []data.Annonce {
 	start := time.Now()
 	annonces := []data.Annonce{}
 	for _, scrap := range s.Scrappers {
-		for _, ann := range scrap.Annonces {
-			annonces = append(annonces, ann)
-		}
+		annonces = append(annonces, scrap.Annonces...)
 	}
 	end := time.Now()
 	fmt.Println(end.Sub(start))
