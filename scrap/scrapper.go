@@ -111,7 +111,7 @@ func ParseVille(loc string, site string) string {
 }
 
 func (s *Scrapper) Wrapper() {
-	fmt.Println("Scrapping started")
+	fmt.Println("Scrapping started !! ")
 	start := time.Now()
 	for _, scrap := range s.Scrappers {
 		scrap.UrlScrapper(&scrap)
@@ -122,6 +122,7 @@ func (s *Scrapper) Wrapper() {
 		}
 		fmt.Println(scrap.Annonces)
 	}
+	s.Json()
 	end := time.Now()
 	fmt.Println(end.Sub(start))
 }

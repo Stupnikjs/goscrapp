@@ -126,3 +126,14 @@ func (s *ScrapperSite) ParseDep(str string) int {
 	}
 	return 0
 }
+
+func TestOcpScrapper() {
+	OcpScrapper.UrlScrapper(&OcpScrapper)
+	fmt.Println(OcpScrapper.Urls)
+	for _, url := range OcpScrapper.Urls[:10] {
+		OcpScrapper.GetAnnonce(url)
+
+	}
+	fmt.Println(OcpScrapper.Annonces)
+
+}
