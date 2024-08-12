@@ -4,10 +4,8 @@ import (
 	"context"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/Stupnikjs/goscrapp/data"
 	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
 )
@@ -105,34 +103,4 @@ func GetOcpPaginatorNum(url string) int {
 	}
 
 	return pageInt
-}
-
-func (s *ScrapperSite) ParseDep(str string) int {
-	if s.Site == "moniteur" {
-		return ExtractDepartement(str)
-	}
-	split := strings.Split(str, ",")
-
-	if len(split) < 2 {
-		return 0
-	}
-
-	for dep := range data.Departements {
-		if strings.Contains(dep, strings.TrimSpace(split[1])) && len(dep) == len(strings.TrimSpace(split[1])) {
-			return data.Departements[dep]
-
-		}
-	}
-	return 0
-}
-
-func TestOcpScrapper() {
-	OcpScrapper.UrlScrapper(&OcpScrapper)
-	fmt.Println(OcpScrapper.Urls)
-	for _, url := range OcpScrapper.Urls[:10] {
-		OcpScrapper.GetAnnonce(url)
-
-	}
-	fmt.Println(OcpScrapper.Annonces)
-
 }

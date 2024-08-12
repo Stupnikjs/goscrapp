@@ -2,6 +2,7 @@ package scrap
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -30,6 +31,7 @@ type ScrapperSite struct {
 
 type Scrapper struct {
 	Scrappers []ScrapperSite
+	DB        *sql.DB
 }
 
 var Scr = Scrapper{
@@ -52,8 +54,8 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(s.Selectors)
 	a := s.SelectorToAnnonce()
+	a.Departement = s.ParseDep(a.Lieu)
 	a.Url = url
 	s.Annonces = append(s.Annonces, a)
 }
@@ -121,6 +123,26 @@ func ParseVille(loc string, site string) string {
 
 }
 
+func (s *ScrapperSite) ParseDep(str string) int {
+	if s.Site == "moniteur" {
+		return ExtractDepartement(str)
+	}
+	split := strings.Split(str, ",")
+
+	if len(split) < 2 {
+		return 0
+	}
+
+	for dep := range data.Departements {
+		if strings.Contains(dep, strings.TrimSpace(split[1])) && len(dep) == len(strings.TrimSpace(split[1])) {
+			return data.Departements[dep]
+
+		}
+	}
+	return 0
+}
+
+/*      Wrappers      */
 func (s *Scrapper) Wrapper() {
 	fmt.Println("Scrapping started !! ")
 	start := time.Now()

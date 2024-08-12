@@ -11,7 +11,6 @@ var commandsMap = map[string]func(){
 	"scrap": scrap.Scr.Wrapper,
 	"an":    scrap.Scr.PrintAnnnonces,
 	"json":  scrap.Scr.Json,
-	"test":  scrap.TestOcpScrapper,
 }
 
 func CommandParser(cmd string) {
