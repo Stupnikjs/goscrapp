@@ -6,7 +6,11 @@ import (
 	"github.com/Stupnikjs/goscrapp/data"
 )
 
-func InitTable() error {
+type PostgresRepo struct {
+   DB *SQL DB
+}
+
+func (m *PostgresRepo) InitTable() error {
 	sqlInit := `CREATE TABLE annonces (
     id          VARCHAR(255),
     url         TEXT,
@@ -23,7 +27,7 @@ func InitTable() error {
 	return nil
 }
 
-func InsertAnnonces(data.Annonce) error {
+func (m *PostgresRepo)InsertAnnonces(data.Annonce) error {
 
 	return nil
 }
