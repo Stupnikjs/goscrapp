@@ -1,12 +1,5 @@
 package data
 
-import "database/sql"
-
-type Application struct {
-	DB       *sql.DB
-	Commands map[string]func()
-}
-
 type Annonce struct {
 	Id          string `json:"id"`
 	Url         string `json:"url"`

@@ -7,7 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Stupnikjs/goscrapp/data"
 	"github.com/joho/godotenv"
 )
 
@@ -22,7 +21,7 @@ func main() {
 	if err != nil {
 		fmt.Println("connection successful to sql")
 	}
-	app := data.Application{
+	app := Application{
 		Commands: commandsMap,
 		DB:       db,
 	}
