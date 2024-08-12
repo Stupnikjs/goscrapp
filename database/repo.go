@@ -1,9 +1,7 @@
-
+package database
 
 type DBRepo interface {
     InitTable() error
-    InsertAnnonce (Annonce) error
-
-
+    InsertAnnonce (data.Annonce) error
 
 }
