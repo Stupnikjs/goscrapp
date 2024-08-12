@@ -1,13 +1,14 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 
 	"github.com/Stupnikjs/goscrapp/data"
 )
 
 type PostgresRepo struct {
-   DB *SQL DB
+	DB *sql.DB
 }
 
 func (m *PostgresRepo) InitTable() error {
@@ -27,7 +28,7 @@ func (m *PostgresRepo) InitTable() error {
 	return nil
 }
 
-func (m *PostgresRepo)InsertAnnonces(data.Annonce) error {
+func (m *PostgresRepo) InsertAnnonces(data.Annonce) error {
 
 	return nil
 }

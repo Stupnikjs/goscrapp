@@ -1,14 +1,14 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 
+	"github.com/Stupnikjs/goscrapp/database"
 	"github.com/Stupnikjs/goscrapp/scrap"
 )
 
 type Application struct {
-	DB       *database.DBRepo
+	DB       database.DBRepo
 	Commands map[string]func()
 }
 

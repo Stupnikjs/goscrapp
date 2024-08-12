@@ -1,7 +1,8 @@
 package database
 
-type DBRepo interface {
-    InitTable() error
-    InsertAnnonce (data.Annonce) error
+import "github.com/Stupnikjs/goscrapp/data"
 
+type DBRepo interface {
+	InitTable() error
+	InsertAnnonce(data.Annonce) error
 }
