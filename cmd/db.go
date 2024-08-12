@@ -1,4 +1,4 @@
-package scrap
+package main
 
 import (
 	"database/sql"

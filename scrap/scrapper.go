@@ -57,6 +57,7 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 	a := s.SelectorToAnnonce()
 	a.Departement = s.ParseDep(a.Lieu)
 	a.Url = url
+	a.Id = ParseWebID(url, s.Site)
 	s.Annonces = append(s.Annonces, a)
 }
 
@@ -146,16 +147,18 @@ func (s *ScrapperSite) ParseDep(str string) int {
 func (s *Scrapper) Wrapper() {
 	fmt.Println("Scrapping started !! ")
 	start := time.Now()
+	annonces := []data.Annonce{}
 	for _, scrap := range s.Scrappers {
 		scrap.UrlScrapper(&scrap)
 		fmt.Println("urls scrapped")
-		for i, url := range scrap.Urls[:100] {
+		for _, url := range scrap.Urls[:50] {
 			scrap.GetAnnonce(url)
-			fmt.Println(i)
+
 		}
-		fmt.Println(scrap.Annonces)
+		annonces = append(annonces, scrap.Annonces...)
+
 	}
-	s.Json()
+	s.Json(annonces)
 	end := time.Now()
 	fmt.Println(end.Sub(start))
 }
@@ -179,8 +182,9 @@ func (s *Scrapper) GetAllAnnonces() []data.Annonce {
 	return annonces
 }
 
-func (s *Scrapper) Json() {
-	annonces := s.GetAllAnnonces()
+// ne marche pas
+func (s *Scrapper) Json(annonces []data.Annonce) {
+
 	bytes, err := json.Marshal(annonces)
 	if err != nil {
 		fmt.Println(err)
