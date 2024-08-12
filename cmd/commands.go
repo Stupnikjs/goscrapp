@@ -1,16 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 
+	"github.com/Stupnikjs/goscrapp/data"
 	"github.com/Stupnikjs/goscrapp/scrap"
 )
-
-type Application struct {
-	DB       *sql.DB
-	Commands map[string]func()
-}
 
 var commandsMap = map[string]func(){
 	"exit":  Exit,
@@ -18,7 +13,7 @@ var commandsMap = map[string]func(){
 	"an":    scrap.Scr.PrintAnnnonces,
 }
 
-func (app *Application) CommandParser(cmd string) {
+func (app *data.Application) CommandParser(cmd string) {
 	f, ok := app.Commands[cmd]
 	if ok {
 		f()
