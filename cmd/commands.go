@@ -8,7 +8,7 @@ import (
 )
 
 type Application struct {
-	DB       *sql.DB
+	DB       *DBRepo
 	Commands map[string]func()
 }
 
