@@ -49,6 +49,7 @@ require (
 	cloud.google.com/go/cloudsqlconn v1.11.1
 	github.com/chromedp/chromedp v0.9.5
 	github.com/chromedp/sysutil v1.0.0 // indirect
+	github.com/joho/godotenv v1.5.1
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 )

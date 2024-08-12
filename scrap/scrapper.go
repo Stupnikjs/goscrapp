@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
+	"github.com/Stupnikjs/goscrapp/database"
 	"github.com/chromedp/chromedp"
 )
 
@@ -41,7 +42,7 @@ var Scr = Scrapper{
 	},
 }
 
-func (s *ScrapperSite) GetAnnonce(url string) {
+func (s *ScrapperSite) GetAnnonce(url string) data.Annonce {
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
 	defer cancel()
@@ -59,6 +60,7 @@ func (s *ScrapperSite) GetAnnonce(url string) {
 	a.Url = url
 	a.Id = ParseWebID(url, s.Site)
 	s.Annonces = append(s.Annonces, a)
+	return a
 }
 
 func (s *ScrapperSite) SelectorProcessor(url string) []chromedp.Action {
@@ -152,7 +154,11 @@ func (s *Scrapper) Wrapper() {
 		scrap.UrlScrapper(&scrap)
 		fmt.Println("urls scrapped")
 		for _, url := range scrap.Urls[:50] {
-			scrap.GetAnnonce(url)
+			a := scrap.GetAnnonce(url)
+			err := database.InsertAnnonces(a)
+			if err != nil {
+				fmt.Println(err)
+			}
 
 		}
 		annonces = append(annonces, scrap.Annonces...)
