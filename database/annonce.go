@@ -12,7 +12,7 @@ type PostgresRepo struct {
 }
 
 func (m *PostgresRepo) InitTable() error {
-	sqlInit := `CREATE TABLE annonces IF NOT EXISTS (
+	sqlInit := `CREATE TABLE IF NOT EXISTS annonces (
     id          VARCHAR(255),
     url         TEXT,
     pubdate     DATE,
