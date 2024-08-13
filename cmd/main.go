@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 
+	"github.com/Stupnikjs/goscrapp/database"
+	"github.com/Stupnikjs/goscrapp/scrap"
 	"github.com/joho/godotenv"
 )
 
@@ -19,12 +21,21 @@ func main() {
 	db, err := ConnectToDB()
 
 	if err != nil {
-		fmt.Println("connection successful to sql")
+		fmt.Println(err)
+	} else {
+		fmt.Println("connection succesfull")
+	}
+
+	repo := database.PostgresRepo{
+		DB: db,
 	}
 	app := Application{
-		Commands: commandsMap,
-		DB:       db,
+		DB:       &repo,
+		Scrapper: &scrap.Scr,
 	}
+
+	err = app.DB.InitTable()
+	fmt.Println(err)
 
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Print(">: ")

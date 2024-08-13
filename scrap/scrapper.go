@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
-	"github.com/Stupnikjs/goscrapp/database"
 	"github.com/chromedp/chromedp"
 )
 
@@ -143,30 +142,6 @@ func (s *ScrapperSite) ParseDep(str string) int {
 		}
 	}
 	return 0
-}
-
-/*      Wrappers      */
-func (s *Scrapper) Wrapper() {
-	fmt.Println("Scrapping started !! ")
-	start := time.Now()
-	annonces := []data.Annonce{}
-	for _, scrap := range s.Scrappers {
-		scrap.UrlScrapper(&scrap)
-		fmt.Println("urls scrapped")
-		for _, url := range scrap.Urls[:50] {
-			a := scrap.GetAnnonce(url)
-			err := database.InsertAnnonces(a)
-			if err != nil {
-				fmt.Println(err)
-			}
-
-		}
-		annonces = append(annonces, scrap.Annonces...)
-
-	}
-	s.Json(annonces)
-	end := time.Now()
-	fmt.Println(end.Sub(start))
 }
 
 func (s *Scrapper) PrintAnnnonces() {
