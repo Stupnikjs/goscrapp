@@ -15,14 +15,14 @@ func (m *PostgresRepo) InitTable() error {
 	sqlInit := `CREATE TABLE IF NOT EXISTS annonces (
     id          VARCHAR(255),
     url         TEXT,
-    pubdate     DATE,
+    pubdate     TEXT,
     ville       VARCHAR(255),
     lieu        VARCHAR(255),
     departement INT,
     description TEXT,
     profession  VARCHAR(255),
     contrat     VARCHAR(255),
-    created_at  DATE
+    created_at  TEXT,
 );`
 	_, err := m.DB.Exec(sqlInit)
 	return err
