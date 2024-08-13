@@ -22,7 +22,7 @@ func (m *PostgresRepo) InitTable() error {
     description TEXT,
     profession  VARCHAR(255),
     contrat     VARCHAR(255),
-    created_at  TEXT,
+    created_at  TEXT
 );`
 	_, err := m.DB.Exec(sqlInit)
 	return err
