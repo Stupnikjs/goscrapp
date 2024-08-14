@@ -21,7 +21,10 @@ func (app *Application) CommandParser(cmd string) {
 		app.Wrapper()
 	case "exit":
 		os.Exit(1)
+	default:
+		fmt.Println("unexpected command")
 	}
+
 }
 
 /*      Wrappers      */
