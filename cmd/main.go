@@ -33,7 +33,8 @@ func main() {
 		DB:       &repo,
 		Scrapper: &scrap.Scr,
 	}
-
+	err = app.DB.DropTable()
+	fmt.Println(err)
 	err = app.DB.InitTable()
 	fmt.Println(err)
 
