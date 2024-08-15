@@ -48,51 +48,26 @@ func ScrappClubOffUrls(s *ScrapperSite) *ScrapperSite {
 		chromedp.Navigate(url),
 		chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label"),
 		chromedp.ActionFunc(func(ctx context.Context) error {
-			var previousLength, currentLength int
-			for {
-
-				// Get the number of items before scrolling
-				if err := chromedp.Evaluate(`
-                    document.querySelectorAll('.item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label').length;
-                `, &previousLength).Do(ctx); err != nil {
-					return err
-				}
-				fmt.Println(previousLength)
-				// Scroll down by a fixed amount (e.g., 1000 pixels or adjust as needed)
-				if err := chromedp.Evaluate(fmt.Sprintf(`
-                    document.querySelectorAll('.item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label')[%d].scrollIntoView() ;
-                `, previousLength-2), nil).Do(ctx); err != nil {
-					return err
-				}
-
-				// Wait for new content to load
-				time.Sleep(2 * time.Second) // Adjust the sleep time as needed
-
-				// Get the number of items after scrolling
-				if err := chromedp.Evaluate(`
-                    document.querySelectorAll('.item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label').length;
-                `, &currentLength).Do(ctx); err != nil {
-					return err
-				}
-
-				// Check if new content was loaded
-				if currentLength == previousLength {
-					break // No new content loaded, exit the loop
-				}
+			n := 13
+			err := chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label").Do(ctx)
+			if err != nil {
+				return err
+			}
+			err = chromedp.Evaluate(fmt.Sprintf(`
+				document.querySelectorAll('.item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label')[%d].scrollIntoView();
+				`, n), nil).Do(ctx)
+			if err != nil {
+				return err
+			}
+			err = chromedp.Sleep(time.Second * 2).Do(ctx)
+			if err != nil {
+				return err
 			}
 			return nil
 		}),
 		/*
-			chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label"),
-			chromedp.Evaluate(`
-			document.querySelectorAll('.item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label')[13].scrollIntoView();
-			`, nil),
-			chromedp.Sleep(2*time.Second),
-			chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label"),
-			chromedp.Evaluate(`
-			document.querySelectorAll('.item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label')[26].scrollIntoView();
-			`, nil),
-		*/
+
+		 */
 		chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label"),
 		chromedp.Evaluate(`
 		Array.from(document.querySelectorAll('.item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label')).map(
@@ -105,6 +80,7 @@ func ScrappClubOffUrls(s *ScrapperSite) *ScrapperSite {
 		fmt.Println(err)
 	}
 	fmt.Println(len(href))
+	fmt.Println(href)
 	return s
 
 }
