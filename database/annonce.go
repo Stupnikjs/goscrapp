@@ -11,6 +11,13 @@ type PostgresRepo struct {
 	DB *sql.DB
 }
 
+func (m *PostgresRepo) DropTable() error {
+	sqlDrop := `DROP TABLE annonces;
+`
+	_, err := m.DB.Exec(sqlDrop)
+	return err
+}
+
 func (m *PostgresRepo) InitTable() error {
 	sqlInit := `CREATE TABLE IF NOT EXISTS annonces (
     id          VARCHAR(255),

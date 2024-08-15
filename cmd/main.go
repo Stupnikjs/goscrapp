@@ -31,7 +31,7 @@ func main() {
 	}
 	app := Application{
 		DB:       &repo,
-		Scrapper: &scrap.Scr,
+		Scrapper: &scrap.Test,
 	}
 
 	err = app.DB.InitTable()
