@@ -41,6 +41,12 @@ var Scr = Scrapper{
 	},
 }
 
+var Test = Scrapper{
+	Scrappers: []ScrapperSite{
+		ClubOffScrapper,
+	},
+}
+
 func (s *ScrapperSite) GetAnnonce(url string) data.Annonce {
 	ctx, _ := chromedp.NewContext(context.Background())
 	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
