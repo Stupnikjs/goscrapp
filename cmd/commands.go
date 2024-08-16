@@ -37,6 +37,7 @@ func (app *Application) Wrapper() {
 		fmt.Println("urls scrapped")
 		for _, url := range scrap.Urls {
 			a := scrap.GetAnnonce(url)
+			fmt.Println(a)
 			err := app.DB.InsertAnnonce(a)
 			if err != nil {
 				fmt.Println(err)
