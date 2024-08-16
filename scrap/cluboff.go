@@ -70,7 +70,7 @@ func ScrollWithChromeDP(ctx context.Context) chromedp.ActionFunc {
 	return chromedp.ActionFunc(func(ctx context.Context) error {
 
 		length := 0
-		for length < 1000 {
+		for length < 300 {
 
 			err := chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label").Do(ctx)
 			if err != nil {
