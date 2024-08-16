@@ -40,7 +40,7 @@ func ScrappClubOffUrls(s *ScrapperSite) *ScrapperSite {
 	var url string = "https://www.clubofficine.fr/rechercher/offres"
 	var href []string
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Second*50)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*500)
 	defer cancel()
 
 	err := chromedp.Run(
@@ -70,7 +70,7 @@ func ScrollWithChromeDP(ctx context.Context) chromedp.ActionFunc {
 	return chromedp.ActionFunc(func(ctx context.Context) error {
 
 		length := 0
-		for length < 300 {
+		for length < 3000 {
 
 			err := chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label").Do(ctx)
 			if err != nil {
