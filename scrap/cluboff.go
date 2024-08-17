@@ -16,16 +16,19 @@ var ClubOffSelectors = []Selector{
 		Name:             "entreprise",
 	},
 	{
-		SelectorPath: `//p[@class="city"]`,
-		Name:         "lieu",
+		SelectorEvaluate: ``,
+		SelectorPath:     `//p[@class="city"]`,
+		Name:             "lieu",
 	},
 	{ // //ion-col[contains(@class, "ion-no-padding") and contains(@class, "offerHeaderCol")]
-		SelectorPath: `//h1`,
-		Name:         "emploi",
+		SelectorEvaluate: ``,
+		SelectorPath:     `//span`,
+		Name:             "emploi",
 	},
 	{
-		SelectorPath: `//ion-col//p//span`,
-		Name:         "contrat",
+		SelectorEvaluate: `5+5`,
+		SelectorPath:     `//title`,
+		Name:             "contrat",
 	},
 }
 
@@ -70,7 +73,7 @@ func ScrollWithChromeDP(ctx context.Context) chromedp.ActionFunc {
 	return chromedp.ActionFunc(func(ctx context.Context) error {
 
 		length := 0
-		for {
+		for length < 100 {
 			prevlength := length
 			err := chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label").Do(ctx)
 			if err != nil {

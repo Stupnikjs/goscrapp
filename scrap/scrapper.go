@@ -49,15 +49,22 @@ var Test = Scrapper{
 }
 
 func (s *ScrapperSite) GetAnnonce(url string) data.Annonce {
-	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Second*30)
+
+	ctx, cancel := chromedp.NewContext(context.Background())
+	ctx, cancel = context.WithTimeout(ctx, time.Second*20)
 	defer cancel()
 
+	fmt.Println(url)
+	text := ""
 	err := chromedp.Run(
 		ctx,
-		s.SelectorProcessor(url)...,
-	)
+		chromedp.WaitReady("body", chromedp.ByQuery),
+		chromedp.InnerHTML("html", &text),
+		chromedp.Evaluate(`document.querySelector("html")`, &text),
 
+	//s.SelectorProcessor(url)...,
+	)
+	fmt.Println("text", text)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -74,8 +81,14 @@ func (s *ScrapperSite) SelectorProcessor(url string) []chromedp.Action {
 		chromedp.Navigate(url),
 	}
 	for i := range s.Selectors {
-		b := chromedp.Text(s.Selectors[i].SelectorPath, &s.Selectors[i].Value, chromedp.NodeVisible)
-		a = append(a, b)
+		if s.Selectors[i].SelectorEvaluate == `` {
+			b := chromedp.Text(s.Selectors[i].SelectorPath, &s.Selectors[i].Value, chromedp.NodeVisible)
+			a = append(a, b)
+		} else {
+			a = append(a, chromedp.WaitVisible("h1"))
+			b := chromedp.Evaluate(s.Selectors[i].SelectorEvaluate, &s.Selectors[i].Value)
+			a = append(a, b)
+		}
 	}
 	return a
 }

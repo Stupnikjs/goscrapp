@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"os/exec"
 	"time"
 
 	"github.com/Stupnikjs/goscrapp/data"
@@ -19,6 +21,15 @@ func (app *Application) CommandParser(cmd string) {
 	switch cmd {
 	case "scrap":
 		app.Wrapper()
+	case "test":
+		res := exec.Command("curl", "https://www.clubofficine.fr/rechercher/offres/offre/monpazier-pharmacien-hf-147640")
+		output, err := res.Output()
+		if err != nil {
+			log.Fatalf("Failed to execute command: %s", err)
+		}
+
+		// Print the result
+		fmt.Println(string(output))
 	case "exit":
 		os.Exit(1)
 	default:
