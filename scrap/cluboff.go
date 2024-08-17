@@ -12,19 +12,19 @@ import (
 
 var ClubOffSelectors = []Selector{
 	{
-		SelectorPath: `//ion-row[contains(@class,"coloredRow") and contains(@class, "md") and contains(@class, "hydrated")]//ion-col/p`,
-		Name:         "entreprise",
+		SelectorEvaluate: ``,
+		Name:             "entreprise",
 	},
 	{
-		SelectorPath: `//div`,
+		SelectorPath: `//p[@class="city"]`,
 		Name:         "lieu",
 	},
-	{
-		SelectorPath: `//ion-col[contains(@class, "ion-no-padding") and contains(@class, "offerHeaderCol")]//h1`,
+	{ // //ion-col[contains(@class, "ion-no-padding") and contains(@class, "offerHeaderCol")]
+		SelectorPath: `//h1`,
 		Name:         "emploi",
 	},
 	{
-		SelectorPath: `//div`,
+		SelectorPath: `//ion-col//p//span`,
 		Name:         "contrat",
 	},
 }
@@ -40,7 +40,7 @@ func ScrappClubOffUrls(s *ScrapperSite) *ScrapperSite {
 	var url string = "https://www.clubofficine.fr/rechercher/offres"
 	var href []string
 	ctx, _ := chromedp.NewContext(context.Background())
-	ctx, cancel := context.WithTimeout(ctx, time.Second*500)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*200)
 	defer cancel()
 
 	err := chromedp.Run(
@@ -70,8 +70,8 @@ func ScrollWithChromeDP(ctx context.Context) chromedp.ActionFunc {
 	return chromedp.ActionFunc(func(ctx context.Context) error {
 
 		length := 0
-		for length < 3000 {
-
+		for {
+			prevlength := length
 			err := chromedp.WaitVisible(".item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label").Do(ctx)
 			if err != nil {
 				return err
@@ -82,16 +82,21 @@ func ScrollWithChromeDP(ctx context.Context) chromedp.ActionFunc {
 			if err != nil {
 				return err
 			}
+			if prevlength == length {
+				break
+			}
 			err = chromedp.Evaluate(fmt.Sprintf(`
 			document.querySelectorAll('.item.md.item-lines-default.item-fill-none.in-list.ion-activatable.ion-focusable.hydrated.item-label')[%d].scrollIntoView();
 			`, length-1), nil).Do(ctx)
 			if err != nil {
 				return err
 			}
-			err = chromedp.Sleep(time.Second * 2).Do(ctx)
-			if err != nil {
-				return err
-			}
+			/*
+				err = chromedp.Sleep(time.Second * 2).Do(ctx)
+				if err != nil {
+					return err
+				}
+			*/
 		}
 		return nil
 	})

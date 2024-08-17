@@ -14,9 +14,10 @@ import (
 )
 
 type Selector struct {
-	SelectorPath string
-	Name         string
-	Value        string
+	SelectorPath     string
+	SelectorEvaluate string
+	Name             string
+	Value            string
 }
 
 type Selectors []Selector
@@ -110,6 +111,8 @@ func ParseWebID(url string, site string) string {
 		split := strings.Split(url, "/")
 		return split[len(split)-2]
 
+	case "clubofficine":
+		return ""
 	default:
 		fmt.Println("error wrong site property")
 		return ""
